@@ -419,31 +419,49 @@ window.fetchBlockchainHistory = async function(type) {
 
 async function fetchAllData(address) {
     try {
+        // 1. Address se User ID nikalna (Contract function)
         const userId = await window.contract.addressToId(address);
-        if (userId.eq(0)) return;
+        
+        if (userId.eq(0)) {
+            console.log("User ID is 0, not registered.");
+            return;
+        }
 
+        // 2. User ID se details nikalna
         const details = await window.contract.getUserDetails(userId);
         
-        // Mapping Data to HTML IDs
-        updateText('user-id-display', "#" + userId.toString());
+        // --- 3. DASHBOARD SYNC (Har ek ID ko address ke data se bharna) ---
+        
+        // Header & Profile
+        updateText('user-id-display', userId.toString());
         updateText('connect-btn', address.substring(0,6) + "..." + address.substring(38));
-        updateText('total-income', format(details.totalIncome));
-        updateText('total-income-display', format(details.totalIncome));
-        updateText('balance-large', format(details.totalIncome));
-        updateText('direct-count', details.partnersCount.toString());
-        updateText('partners-count', details.partnersCount.toString());
-        updateText('team-size', details.teamSize.toString());
-        updateText('current-rank-header', "Rank: " + details.rank.toString());
         updateText('rank-display', "Rank: " + details.rank.toString());
-        updateText('active-slots-count', details.activeSlotsCount + "/12");
-        updateText('referrer-id-display', "ID: " + details.referrerId.toString());
+        updateText('current-rank-header', "Rank: " + details.rank.toString());
 
-        // Referral Link
-        const refUrl = `${window.location.origin}/register.html?ref=${address}`;
+        // Referral Link (Address based link)
+        const refUrl = window.location.origin + window.location.pathname.replace('index1.html', 'register.html') + "?ref=" + address;
         const refInput = document.getElementById('refURL');
         if(refInput) refInput.value = refUrl;
 
-    } catch (e) { console.error("Fetch Data Error:", e); }
+        // Income & Earnings
+        const income = format(details.totalIncome);
+        updateText('total-income', income);
+        updateText('total-income-display', income);
+        updateText('balance-large', income);
+        updateText('matrix-earnings', income + " USDT"); // Defaulting matrix to total as per contract
+        updateText('level-earnings', "0.00 USDT");
+        updateText('direct-earnings', "0.00 USDT");
+
+        // Team & Network
+        updateText('partners-count', details.partnersCount.toString());
+        updateText('direct-count', details.partnersCount.toString());
+        updateText('team-size', details.teamSize.toString());
+        updateText('active-slots-count', details.activeSlotsCount + "/12");
+        updateText('referrer-id-display', "ID: " + details.referrerId.toString());
+
+    } catch (e) {
+        console.error("Fetch Data Error:", e);
+    }
 }
 window.loadMatrixData = async function(level) {
     try {
