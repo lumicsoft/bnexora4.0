@@ -177,20 +177,21 @@ window.handleLogin = async function() {
         contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
         localStorage.removeItem('manualLogout');
         
-        const userData = await contract.users(userAddress);
-        if (userData.id.gt(0)) {
-            if(typeof showLogoutIcon === "function") showLogoutIcon(userAddress);
-            window.location.href = "index1.html";
+        // Check registration status via contract function
+        const registered = await contract.isUserExists(userAddress);
+        
+        if (registered) {
+            showLogoutIcon(userAddress);
+            window.location.href = "index1.php";
         } else {
-            alert("This wallet is not registered!");
+            alert("This wallet is not registered in Bnexora!");
             window.location.href = "register.html";
         }
     } catch (err) {
         console.error("Login Error:", err);
-        alert("Login failed! Make sure you are on BSC Testnet.");
+        alert("Login failed! Ensure you are on BSC Testnet.");
     }
 }
-
 window.handleRegister = async function() {
     try {
         if (!window.ethereum) {
