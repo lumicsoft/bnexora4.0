@@ -182,7 +182,7 @@ window.handleLogin = async function() {
         
         if (registered) {
             showLogoutIcon(userAddress);
-            window.location.href = "index1.php";
+            window.location.href = "index1.html";
         } else {
             alert("This wallet is not registered in Bnexora!");
             window.location.href = "register.html";
@@ -263,7 +263,7 @@ window.handleRegister = async function() {
             if (receipt.status === 1) {
                 alert("Registration Successful with 10 USDT Package!");
                 localStorage.removeItem('manualLogout');
-                window.location.href = "index1.php";
+                window.location.href = "index1.html";
             }
         } catch (gasErr) {
             console.error("Gas Estimation Failed:", gasErr);
@@ -297,7 +297,7 @@ async function fetchAllData(address) {
 
         // Referral Link Generator (Using User ID)
         const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
-        const refUrl = `${baseUrl}/register.php?ref=${userId.toString()}`;
+        const refUrl = `${baseUrl}/register.html?ref=${userId.toString()}`;
         if (document.getElementById('refURL')) {
             document.getElementById('refURL').value = refUrl;
         }
