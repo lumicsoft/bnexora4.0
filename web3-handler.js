@@ -432,48 +432,62 @@ window.fetchBlockchainHistory = async function(type) {
 
 async function fetchAllData(address) {
     try {
+        console.log("Fetching data for:", address);
+        
         // --- 1. DIRECT ADDRESS SE DETAILS NIKALNA ---
-        // Humne userId wala step hata diya hai kyunki ab contract address se details dega
-        const details = await window.contract.getUserDetails(address);
+        // Final ABI ke mutabik function ka naam 'getUserDetailsByAddress' hai
+        const details = await window.contract.getUserDetailsByAddress(address);
         
         // --- 2. DASHBOARD SYNC ---
         
-        // Header & Profile
-        // Agar details mein ID abhi bhi aa rahi hai toh use dikhayenge
-        updateText('user-id-display', details.id ? details.id.toString() : "N/A");
+        // Header & Profile Setup
+        // Naye ABI mein 'id' pehla return parameter hai
+        updateText('user-id-display', details.id ? "#" + details.id.toString() : "#0000");
         updateText('connect-btn', address.substring(0,6) + "..." + address.substring(38));
-        updateText('rank-display', "Rank: " + details.rank.toString());
-        updateText('current-rank-header', "Rank: " + details.rank.toString());
+        
+        // Rank Setup
+        const rankLabel = "Rank: " + details.rank.toString();
+        updateText('rank-display', rankLabel);
+        updateText('current-rank-header', rankLabel);
 
-        // Referral Link (Address based link - No change needed here)
-        const refUrl = window.location.origin + window.location.pathname.replace('index1.html', 'register.html') + "?ref=" + address;
+        // Referral Link (Address based link as requested)
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+        const refUrl = window.location.origin + basePath + "register.html?ref=" + address;
+        
         const refInput = document.getElementById('refURL');
-        if(refInput) refInput.value = refUrl;
+        if(refInput) {
+            refInput.value = refUrl;
+        }
 
-        // Income & Earnings
+        // Income & Earnings Setup
         const income = format(details.totalIncome);
         updateText('total-income', income);
-        updateText('total-income-display', income);
+        updateText('total-income-display', income); // Agar element exists karta hai
         updateText('balance-large', income);
         
-        // Aapke contract ke naye structure ke hisaab se Matrix aur Level income set karein
+        // Matrix, Level aur Direct Income (Contract abhi total income hi de raha hai)
         updateText('matrix-earnings', income + " USDT"); 
         updateText('level-earnings', "0.00 USDT");
         updateText('direct-earnings', "0.00 USDT");
 
-        // Team & Network
+        // Team & Network Stats
         updateText('partners-count', details.partnersCount.toString());
         updateText('direct-count', details.partnersCount.toString());
         updateText('team-size', details.teamSize.toString());
-        updateText('active-slots-count', details.activeSlotsCount + "/12");
+        
+        // Active Slots count (Level 1 to 12)
+        updateText('active-slots-count', details.activeSlotsCount.toString() + "/12");
         
         // Referrer details
-        updateText('referrer-id-display', "Ref: " + (details.referrerId ? details.referrerId.toString() : "Direct"));
+        updateText('referrer-id-display', "Ref ID: " + details.referrerId.toString());
 
     } catch (e) {
-        console.error("Fetch Data Error (Address Mode):", e);
+        console.error("Fetch Data Error (Final Sync):", e);
+        // Agar dashboard load nahi hota toh console check karein ki function name match kar raha hai ya nahi
     }
 }
+
 window.loadMatrixData = async function(level) {
     try {
         const userAddress = await signer.getAddress();
