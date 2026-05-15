@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Dashboard | RebirthKey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --gold: #ffd700; --bg-dark: #060a08; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-dark); color: white; 
+            background-image: radial-gradient(circle at 50% 0%, #1a2e23, #060a08 80%);
+        }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        .gold-border-fixed {
+            background: #000000; border: 1.5px solid var(--gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15); border-radius: 20px;
+        }
+
+        .income-card {
+            background: rgba(0,0,0,0.6); border: 1.5px solid var(--gold);
+            padding: 20px; border-radius: 18px; display: flex; align-items: center; gap: 15px;
+        }
+
+        .package-card {
+            background: linear-gradient(180deg, rgba(255,215,0,0.05) 0%, rgba(0,0,0,1) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 20px 12px;
+            text-align: center;
+            transition: 0.3s ease;
+            position: relative;
+        }
+        .package-card.active-card {
+            border: 1.5px solid var(--gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .price-tag {
+            font-size: 1.8rem; font-weight: 900; color: white;
+            font-family: 'Orbitron', sans-serif; margin-bottom: 15px;
+            display: block;
+        }
+
+        .btn-buy-elite {
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: black; font-weight: 900; border-radius: 8px;
+            font-size: 10px; text-transform: uppercase; width: 100%; 
+            padding: 8px 4px; margin-bottom: 15px; transition: 0.3s;
+        }
+        .btn-rebuy-elite {
+            background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); font-weight: 900; border-radius: 8px;
+            font-size: 10px; text-transform: uppercase; width: 100%; 
+            padding: 8px 4px; margin-bottom: 15px; transition: 0.3s;
+        }
+        .btn-rebuy-elite:hover { background: var(--gold); color: black; }
+
+        .meta-info-line {
+            display: flex; justify-content: space-between;
+            padding: 6px 0; border-top: 1px solid rgba(255,215,0,0.1);
+            font-size: 9px; font-weight: 700; text-transform: uppercase;
+        }
+        .status-text-active { color: #22c55e; }
+        .status-text-pending { color: #ef4444; }
+
+        .icon-box { color: var(--gold); }
+        .pending-text { font-size: 10px; color: #888; font-weight: bold; margin-top: 2px; }
+        .claim-section { 
+            background: linear-gradient(90deg, rgba(255,215,0,0.1), transparent);
+            border-left: 4px solid var(--gold);
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <script src="components.js"></script>
+
+    <main class="max-w-7xl mx-auto px-4 pt-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+            <div class="lg:col-span-2 gold-border-fixed p-6 flex flex-wrap items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 rounded-2xl bg-yellow-500/10 border border-yellow-500 flex items-center justify-center">
+                        <i data-lucide="shield-check" class="text-yellow-500 w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h2 id="connect-btn" class="text-xl font-black orbitron text-white">Connecting...</h2>
+                        <div class="flex gap-4 mt-1">
+                            <span id="user-id-display" class="text-xs font-bold text-yellow-500 orbitron tracking-widest">ID: #---</span>
+                            <span id="current-rank-header" class="text-[10px] text-gray-500 font-bold uppercase">RANK: SYNCING</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center bg-yellow-500/5 px-6 py-2 rounded-xl border border-yellow-500/30">
+                    <p class="text-[9px] text-gray-500 uppercase font-black">Direct Partners</p>
+                    <p id="direct-count" class="text-2xl font-black orbitron">0</p>
+                </div>
+            </div>
+
+            <div class="gold-border-fixed p-6 flex flex-col justify-center">
+                <div class="flex justify-between items-center mb-3 px-1">
+                    <p class="text-[10px] text-yellow-500 font-black uppercase tracking-widest">Your Referral Link</p>
+                    <a href="https://t.me/rebirthkeysupport" target="_blank" class="flex items-center gap-1 text-cyan-400 hover:text-white transition">
+                        <i data-lucide="send" class="w-3 h-3"></i>
+                        <span class="text-[9px] font-bold uppercase">Support</span>
+                    </a>
+                </div>
+                <div class="flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-yellow-500/30">
+                    <input id="refURL" type="text" readonly value="Syncing..." class="bg-transparent border-none outline-none w-full text-[10px] text-gray-400 font-mono">
+                    <button onclick="copyLink()" class="text-yellow-500 hover:scale-110 transition"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="gold-border-fixed p-6 mb-10 claim-section flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <h3 class="orbitron font-black text-sm text-yellow-500 uppercase tracking-widest">Rewards Claim Center</h3>
+                <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">Includes Daily, Lunar, Booster & Fast Track Rewards</p>
+            </div>
+            <div class="flex items-center gap-8">
+                <div class="text-center">
+                    <p class="text-[9px] text-gray-500 uppercase font-bold">Total Pending</p>
+                    <p id="total-pending-claim" class="text-2xl font-black orbitron text-white">0.00</p>
+                </div>
+                <button onclick="handleClaimRewards()" id="claim-btn" class="px-8 py-3 bg-yellow-500 text-black font-black orbitron text-xs rounded-lg shadow-lg hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed">CLAIM ALL NOW</button>
+            </div>
+        </div>
+
+        <h3 class="orbitron font-black text-xs text-yellow-500 mb-6 tracking-[0.2em] uppercase">Income Statistics</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+            <div class="income-card"><i data-lucide="users" class="icon-box"></i> <div><p class="text-[9px] text-gray-500 uppercase font-bold">Direct Income</p><p id="direct-earnings" class="text-xl font-black orbitron">0.00</p></div></div>
+            <div class="income-card"><i data-lucide="layers" class="icon-box"></i> <div><p class="text-[9px] text-gray-500 uppercase font-bold">Level Income</p><p id="level-earnings" class="text-xl font-black orbitron">0.00</p></div></div>
+            <div class="income-card"><i data-lucide="grid" class="icon-box"></i> <div><p class="text-[9px] text-gray-500 uppercase font-bold">Matrix Income</p><p id="matrix-earnings" class="text-xl font-black orbitron">0.00</p></div></div>
+            
+            <div class="income-card"><i data-lucide="zap" class="icon-box"></i> 
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold">Booster Fund</p>
+                    <p id="booster-fund" class="text-xl font-black orbitron text-yellow-500">0.00</p>
+                    <p class="pending-text">PENDING: <span id="p-booster">0.00</span></p>
+                </div>
+            </div>
+            <div class="income-card"><i data-lucide="sun" class="icon-box"></i> 
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold">Lunar Fund</p>
+                    <p id="lunar-fund" class="text-xl font-black orbitron text-cyan-400">0.00</p>
+                    <p class="pending-text">PENDING: <span id="p-lunar">0.00</span></p>
+                </div>
+            </div>
+            <div class="income-card"><i data-lucide="globe" class="icon-box"></i> 
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold">Daily Income</p>
+                    <p id="daily-earnings" class="text-xl font-black orbitron">0.00</p>
+                    <p class="pending-text">PENDING: <span id="p-daily">0.00</span></p>
+                </div>
+            </div>
+
+            <div class="income-card"><i data-lucide="trending-up" class="icon-box"></i> <div><p class="text-[9px] text-gray-500 uppercase font-bold">Single Leg</p><p id="single-leg-earnings" class="text-xl font-black orbitron">0.00</p></div></div>
+            
+            <div class="income-card border-yellow-500/50 bg-yellow-500/5">
+                <i data-lucide="rocket" class="icon-box text-yellow-400"></i> 
+                <div>
+                    <p class="text-[9px] text-yellow-500 uppercase font-black">Fast Track Bonus</p>
+                    <p id="fast-track-earnings" class="text-xl font-black orbitron">0.00</p>
+                    <p class="pending-text">PENDING: <span id="p-fast-track">0.00</span></p>
+                </div>
+            </div>
+
+            <div class="income-card border-white/40"><i data-lucide="wallet" class="icon-box text-white"></i> <div><p class="text-[9px] text-gray-300 uppercase font-bold">Total Assets</p><p id="total-earned" class="text-xl font-black orbitron text-white">0.00</p></div></div>
+        </div>
+
+        <div class="gold-border-fixed p-4 md:p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-10">
+            <div class="flex-grow text-center md:text-left w-full">
+                <p class="text-[10px] text-yellow-500 font-black uppercase mb-1">Available Balance</p>
+                <div class="flex items-baseline justify-center md:justify-start gap-2 flex-wrap">
+                    <span id="balance-large" class="text-4xl md:text-6xl font-black orbitron break-all">0.00</span>
+                    <span class="text-sm md:text-xl text-gray-500 font-bold">USDT</span>
+                </div>
+            </div>
+
+            <div class="w-full md:w-80">
+                <div class="mb-4 p-3 md:p-4 bg-red-500/10 border border-red-500/40 rounded-xl text-center">
+                    <p class="text-[9px] md:text-[10px] text-red-500 font-black uppercase tracking-widest mb-1">Hold Income</p>
+                    <div class="flex justify-center items-center gap-2">
+                        <span id="held-income" class="text-xl md:text-2xl font-black orbitron text-white">0.00</span>
+                        <span class="text-[10px] text-gray-600 font-bold uppercase">USDT</span>
+                    </div>
+                </div>
+
+                <button onclick="handleWithdraw()" class="w-full py-4 md:py-5 text-sm md:text-lg shadow-xl shadow-yellow-500/10 mb-3" 
+                        style="background: linear-gradient(135deg, #ffd700, #b8860b); color: black; font-weight: 900; border-radius: 10px;">
+                    WITHDRAW NOW
+                </button>
+            </div>
+        </div>
+
+        <h3 class="orbitron font-black text-2xl text-white mb-8 border-l-4 border-yellow-500 pl-4 uppercase">Investment Packages</h3>
+        <div id="package-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-20"></div>
+
+    </main>
+
+    <script src="web3-handler.js"></script>
+    <script>
+        lucide.createIcons();
+
+        const packageData = [
+            { id: 0, name: "G0", price: 5, rebirth: 1 }, 
+            { id: 1, name: "G1", price: 44, rebirth: 5 }, 
+            { id: 2, name: "G2", price: 65, rebirth: 10 }, 
+            { id: 3, name: "G3", price: 106, rebirth: 20 }, 
+            { id: 4, name: "G4", price: 187, rebirth: 40 }, 
+            { id: 5, name: "G5", price: 348, rebirth: 80 }, 
+            { id: 6, name: "G6", price: 669, rebirth: 160 }, 
+            { id: 7, name: "G7", price: 1310, rebirth: 320 }, 
+            { id: 8, name: "G8", price: 2591, rebirth: 640 }, 
+            { id: 9, name: "G9", price: 5152, rebirth: 1280 }, 
+            { id: 10, name: "G10", price: 10273, rebirth: 2560 }, 
+            { id: 11, name: "G11", price: 20514, rebirth: 5120 }
+        ];
+
+        async function renderPackages(activeLevelFromBlockchain = -1) {
+            const container = document.getElementById('package-grid');
+            if(!container) return;
+
+            let rebirthCounts = {};
+            if (window.signer && window.contract) {
+                try {
+                    const addr = await window.signer.getAddress();
+                    const counts = await Promise.all(
+                        packageData.map(pkg => window.contract.rebirthCount(addr, pkg.id))
+                    );
+                    counts.forEach((c, index) => { rebirthCounts[index] = c.toString(); });
+                } catch (e) { console.log("Rebirth fetch error:", e); }
+            }
+
+            container.innerHTML = packageData.map(pkg => {
+                const isActive = activeLevelFromBlockchain >= pkg.id;
+                const myRebirthCount = parseInt(rebirthCounts[pkg.id] || "0"); 
+                const totalRebirthValue = myRebirthCount * pkg.rebirth;
+
+                return `
+                <div class="package-card ${isActive ? 'active-card' : ''}">
+                    <span class="price-tag">$${pkg.price}</span>
+
+                    ${isActive ? 
+                        `<button onclick="handleBuyPackage(${pkg.id})" class="btn-rebuy-elite orbitron">REBUY</button>` : 
+                        `<button onclick="handleBuyPackage(${pkg.id})" class="btn-buy-elite orbitron">BUY NOW</button>`
+                    }
+
+                    <div class="meta-info-line">
+                        <span class="text-gray-500">Tier</span>
+                        <span class="text-white orbitron">${pkg.name}</span>
+                    </div>
+
+                    <div class="meta-info-line">
+                        <span class="text-gray-500">Unit Value</span>
+                        <span class="text-gray-400 orbitron">${pkg.rebirth}</span>
+                    </div>
+
+                    <div class="meta-info-line border-t border-yellow-500/20">
+                        <span class="text-gray-500">My Rebirths</span>
+                        <span class="text-cyan-400 orbitron font-bold">${myRebirthCount}</span>
+                    </div>
+
+                    <div class="meta-info-line bg-yellow-500/5">
+                        <span class="text-yellow-500">Total Value</span>
+                        <span class="text-yellow-500 orbitron font-black">${totalRebirthValue}</span>
+                    </div>
+
+                    <div class="meta-info-line">
+                        <span class="text-gray-500">Status</span>
+                        <span class="${isActive ? 'status-text-active' : 'status-text-pending'}">
+                            ${isActive ? 'Active' : 'Locked'}
+                        </span>
+                    </div>
+                </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function copyLink() {
+            const refInput = document.getElementById('refURL');
+            if (!refInput || refInput.value.includes("Syncing") || !refInput.value) return;
+            refInput.select();
+            navigator.clipboard.writeText(refInput.value);
+            alert("Referral link copied!");
+        }
+
+        async function syncPendingIncomes() {
+            if (!window.signer || !window.contract) return;
+            try {
+                const addr = await window.signer.getAddress();
+                const pendingData = await window.contract.getPendingIncomeDetails(addr);
+                
+              
+                const dailyVal = pendingData[0] ? ethers.utils.formatEther(pendingData[0]) : "0";
+                const lunarVal = pendingData[1] ? ethers.utils.formatEther(pendingData[1]) : "0";
+                const boosterVal = pendingData[2] ? ethers.utils.formatEther(pendingData[2]) : "0";
+                const fastTrackVal = (pendingData.length > 3 && pendingData[3]) ? ethers.utils.formatEther(pendingData[3]) : "0";
+                
+                document.getElementById('p-daily').innerText = parseFloat(dailyVal).toFixed(2);
+                document.getElementById('p-lunar').innerText = parseFloat(lunarVal).toFixed(2);
+                document.getElementById('p-booster').innerText = parseFloat(boosterVal).toFixed(2);
+                document.getElementById('p-fast-track').innerText = parseFloat(fastTrackVal).toFixed(2);
+                
+                const total = parseFloat(dailyVal) + parseFloat(lunarVal) + parseFloat(boosterVal) + parseFloat(fastTrackVal);
+                document.getElementById('total-pending-claim').innerText = total.toFixed(2);
+                
+                const claimBtn = document.getElementById('claim-btn');
+                if(claimBtn) claimBtn.disabled = total <= 0;
+            } catch (e) { console.log("Pending Sync Error:", e); }
+        }
+
+        let lastKnownLevel = -99;
+        window.addEventListener('load', () => {
+            renderPackages(-1); 
+            setInterval(() => {
+                if (window.userData && window.userData.currentPackageId !== undefined) {
+                    const currentLevel = parseInt(window.userData.currentPackageId);
+                    if (currentLevel !== lastKnownLevel) {
+                        lastKnownLevel = currentLevel;
+                        renderPackages(currentLevel);
+                    }
+                    syncPendingIncomes();
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

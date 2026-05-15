@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Deposits </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #050505; color: white; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .status-badge { background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(34, 197, 94, 0.3); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .progress-container { background: rgba(255,255,255,0.05); height: 6px; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-bar { background: linear-gradient(90deg, #f59e0b, #fbbf24); height: 100%; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); transition: width 1s ease-in-out; }
+        .premium-border { border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; background: rgba(255,255,255,0.02); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-[#050505]">
+
+    <div id="header-placeholder"></div>
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10 pb-20">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black orbitron italic uppercase tracking-tighter">Active <span class="text-yellow-500">Nodes</span></h1>
+                <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em]">Live mining performance tracking</p>
+            </div>
+            <button onclick="loadActiveDeposits()" class="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 transition-all active:scale-95">
+                <i data-lucide="refresh-cw" class="w-5 h-5 text-yellow-500"></i>
+            </button>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-2 gap-6 mb-10">
+            <div class="premium-border p-6 text-center border-white/5">
+                <p class="text-[10px] font-black text-gray-500 uppercase mb-1">Total Active Staked</p>
+                <h3 class="text-2xl font-black orbitron text-white flex flex-col items-center justify-center">
+                    <span id="total-active-capital">0.0000</span>
+                    <span id="total-active-usdt" class="text-[10px] text-gray-500 font-sans mt-1">$0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-6 text-center border-yellow-500/10">
+                <p class="text-[10px] font-black text-yellow-500/70 uppercase mb-1">Estimated Daily ROI</p>
+                <h3 class="text-2xl font-black orbitron text-green-400 flex flex-col items-center justify-center">
+                    <span id="total-daily-profit">0.00000</span>
+                    <span id="total-daily-usdt" class="text-[10px] text-gray-500 font-sans mt-1">$0.00</span>
+                </h3>
+            </div>
+        </div>
+
+        <!-- Nodes Grid -->
+        <div id="deposits-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="loading-spinner" class="col-span-full text-center py-20">
+                <div class="inline-block animate-spin text-yellow-500 mb-4">
+                    <i data-lucide="refresh-cw" class="w-10 h-10"></i>
+                </div>
+                <p class="orbitron text-[10px] text-gray-500 uppercase tracking-widest">Scanning Blockchain...</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="components.js"></script>
+    <script src="web3-handler.js"></script>
+    
+    <script>
+async function loadActiveDeposits() {
+    const grid = document.getElementById('deposits-grid');
+    
+    if (!window.contract || !window.signer) { 
+        console.log("Waiting for Web3...");
+        setTimeout(loadActiveDeposits, 1000); 
+        return; 
+    }
+
+    // FIX: Check both possible variable names from your web3-handler
+    const bnbPrice = window.bnbToUsdtPrice || window.bnbPriceUsdt || 0;
+
+    try {
+        const address = await window.signer.getAddress();
+        
+        const [userData, userExtra, positions] = await Promise.all([
+            window.contract.users(address),
+            window.contract.usersExtra(address),
+            window.contract.getUserPositions(address)
+        ]);
+
+        const totalActive = parseFloat(ethers.utils.formatEther(userData.totalActiveDeposit || "0"));
+        const boosterLevel = userExtra.boosterLevel ? parseInt(userExtra.boosterLevel.toString()) : 0;
+
+        let dailyPct = 0.8; 
+        let cappingMult = 3; 
+        if (boosterLevel === 1) { dailyPct = 0.9; cappingMult = 4; }
+        if (boosterLevel === 2) { dailyPct = 1.0; cappingMult = 5; }
+
+        const dailyProfit = totalActive * (dailyPct / 100);
+
+        // Update Summary UI
+        document.getElementById('total-active-capital').innerText = totalActive.toFixed(4) + " BNB";
+        document.getElementById('total-active-usdt').innerText = bnbPrice > 0 ? `$${(totalActive * bnbPrice).toFixed(2)}` : "Fetching...";
+        
+        document.getElementById('total-daily-profit').innerText = dailyProfit.toFixed(5) + " BNB";
+        document.getElementById('total-daily-usdt').innerText = bnbPrice > 0 ? `$${(dailyProfit * bnbPrice).toFixed(2)}` : "Fetching...";
+
+        let html = '';
+        let foundAny = false;
+
+        if (positions && positions.length > 0) {
+            positions.forEach((pos, i) => {
+                const isActive = pos.active || pos[4];
+                const amountRaw = pos.amount ? pos.amount.toString() : "0";
+                const earnedRaw = pos.earned ? pos.earned.toString() : "0";
+
+                if (isActive && parseFloat(amountRaw) > 0) { 
+                    foundAny = true;
+                    const amount = parseFloat(ethers.utils.formatEther(amountRaw));
+                    const earned = parseFloat(ethers.utils.formatEther(earnedRaw));
+                    const maxAllowed = amount * cappingMult;
+                    
+                    let progress = ((earned / maxAllowed) * 100).toFixed(2);
+                    if (parseFloat(progress) > 100) progress = "100.00";
+
+                    html += `
+                    <div class="premium-border p-6 relative overflow-hidden group hover:border-yellow-500/30 transition-all duration-500">
+                        <div class="flex justify-between items-start mb-6">
+                            <div>
+                                <p class="text-[8px] text-yellow-500 font-bold uppercase mb-1 tracking-widest">Node ID: #${i + 1}</p>
+                                <h3 class="text-xl font-black orbitron text-white flex flex-col">
+                                    <span>${amount.toFixed(4)} BNB</span>
+                                    <span class="node-usd-value text-[10px] text-gray-500 font-sans mt-0.5" data-bnb="${amount}">
+                                        ${bnbPrice > 0 ? '$' + (amount * bnbPrice).toFixed(2) : 'Loading...'}
+                                    </span>
+                                </h3>
+                            </div>
+                            <span class="status-badge">ACTIVE</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Earned So Far</p>
+                                <p class="text-xs font-bold text-green-400 flex flex-col">
+                                    <span>${earned.toFixed(6)} BNB</span>
+                                    <span class="node-earned-usd text-[8px] text-gray-500 font-sans mt-0.5" data-earned="${earned}">
+                                        ${bnbPrice > 0 ? '$' + (earned * bnbPrice).toFixed(2) : 'Loading...'}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                                <p class="text-[8px] text-gray-500 font-bold uppercase mb-1">Daily Yield</p>
+                                <p class="text-xs font-bold text-yellow-500">${dailyPct.toFixed(2)}%</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[9px] font-black orbitron">
+                                <span class="text-gray-500">CAPACITY USED (${cappingMult}X)</span>
+                                <span class="text-yellow-500">${progress}%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-bar" style="width: ${progress}%"></div></div>
+                        </div>
+                    </div>`;
+                }
+            });
+        }
+        
+        grid.innerHTML = foundAny ? html : `
+            <div class="col-span-full text-center py-20 border border-dashed border-white/10 rounded-3xl">
+                <i data-lucide="box" class="w-10 h-10 text-gray-700 mx-auto mb-4"></i>
+                <p class="text-gray-600 orbitron text-[10px] uppercase tracking-widest">No Active Nodes Found</p>
+            </div>`;
+        
+        lucide.createIcons();
+
+    } catch (err) {
+        console.error("Load Error:", err);
+        grid.innerHTML = `<div class="col-span-full text-center py-20 text-red-500 orbitron uppercase text-[10px]">Error: Check Wallet Connection</div>`;
+    }
+}
+
+// Live Price Update Logic (Uses both naming possibilities)
+setInterval(() => {
+    const bnbPrice = window.bnbToUsdtPrice || window.bnbPriceUsdt;
+    if(!bnbPrice || bnbPrice === 0) return;
+
+    // Update Summary Stats
+    const activeBnb = parseFloat(document.getElementById('total-active-capital').innerText);
+    const dailyBnb = parseFloat(document.getElementById('total-daily-profit').innerText);
+    
+    if(!isNaN(activeBnb)) {
+        document.getElementById('total-active-usdt').innerText = `$${(activeBnb * bnbPrice).toFixed(2)}`;
+    }
+    if(!isNaN(dailyBnb)) {
+        document.getElementById('total-daily-usdt').innerText = `$${(dailyBnb * bnbPrice).toFixed(2)}`;
+    }
+
+    // Update individual card prices
+    document.querySelectorAll('.node-usd-value').forEach(el => {
+        const bnbVal = parseFloat(el.getAttribute('data-bnb'));
+        if(!isNaN(bnbVal)) el.innerText = `$${(bnbVal * bnbPrice).toFixed(2)}`;
+    });
+    document.querySelectorAll('.node-earned-usd').forEach(el => {
+        const earnedVal = parseFloat(el.getAttribute('data-earned'));
+        if(!isNaN(earnedVal)) el.innerText = `$${(earnedVal * bnbPrice).toFixed(2)}`;
+    });
+}, 3000); // Check every 3 seconds for price updates
+
+window.addEventListener('load', () => setTimeout(loadActiveDeposits, 1500));
+</script>
+</body>
+</html>

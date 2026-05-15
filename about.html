@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Silver Falcon Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #050505; color: white; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .text-gradient { background: linear-gradient(to right, #22d3ee, #fff, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; position: relative; }
+        .premium-border { border-top: 1px solid rgba(34, 211, 238, 0.3); }
+        .value-badge { background: rgba(34, 211, 238, 0.1); color: #22d3ee; padding: 4px 12px; border-radius: 99px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(34, 211, 238, 0.2); }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.15; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="header-placeholder"></div>
+
+    <header class="max-w-7xl mx-auto px-6 pt-32 pb-16 text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1 glass rounded-full text-[9px] font-black tracking-[0.3em] text-cyan-400 border-cyan-500/30 mb-6 uppercase">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            The Future of Yield
+        </div>
+        <h1 class="text-5xl md:text-8xl font-black orbitron mb-6 uppercase leading-[0.9]">
+            The <span class="text-gradient italic">Falcon</span> <br> Legacy
+        </h1>
+        <p class="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed font-medium">
+            Silver Falcon is not just a protocol; it's a high-performance yield engine engineered for the BSC ecosystem, combining 1.0% daily ROI with a massive 30-level network depth.
+        </p>
+    </header>
+
+    <section class="max-w-5xl mx-auto px-6 mb-24 relative z-10">
+        <div class="glass p-12 premium-border text-center md:text-left">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h2 class="text-3xl font-black orbitron uppercase">Our <span class="text-cyan-400">DNA</span></h2>
+                    <p class="text-gray-400 leading-relaxed">
+                        Founded in 2026, Silver Falcon was built to solve the sustainability issues of traditional DeFi. By implementing a strictly capped 300% to 500% earning limit and high-frequency ROI, we ensure a balanced ecosystem for both retail users and elite networkers.
+                    </p>
+                    <div class="flex gap-4">
+                        <div class="glass px-6 py-4 border-l-2 border-cyan-400">
+                            <h4 class="text-2xl font-black orbitron">1%</h4>
+                            <p class="text-[9px] text-gray-500 uppercase font-bold">Max Daily ROI</p>
+                        </div>
+                        <div class="glass px-6 py-4 border-l-2 border-blue-500">
+                            <h4 class="text-2xl font-black orbitron">30</h4>
+                            <p class="text-[9px] text-gray-500 uppercase font-bold">Network Levels</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative group">
+                    <div class="absolute -inset-4 bg-cyan-500/10 blur-3xl rounded-full group-hover:bg-cyan-500/20 transition"></div>
+                    <img src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800" class="rounded-3xl border border-white/10 relative z-10 grayscale hover:grayscale-0 transition duration-500" alt="Protocol">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-10 relative z-10">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-black orbitron italic uppercase">Protocol <span class="text-gradient">Architect</span></h2>
+            <p class="text-gray-500 mt-2 tracking-widest text-[10px] uppercase font-bold">Engineered for Exponential Growth</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glass p-8 premium-border hover:bg-white/[0.04] transition">
+                <i data-lucide="shield-check" class="text-cyan-400 w-12 h-12 mb-6"></i>
+                <h4 class="text-xl font-black orbitron mb-4 uppercase">Bulletproof Security</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">Smart contracts are non-custodial. We don't hold your keys; you interact directly with the BSC Mainnet.</p>
+                <span class="text-[10px] font-bold text-cyan-400 tracking-tighter">VERIFIED ON BSCSCAN</span>
+            </div>
+
+            <div class="glass p-8 premium-border hover:bg-white/[0.04] transition">
+                <i data-lucide="zap" class="text-yellow-400 w-12 h-12 mb-6"></i>
+                <h4 class="text-xl font-black orbitron mb-4 uppercase">Yield Multipliers</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">Choose from Standard (0.8%), Premium (0.9%), or Ultimate (1.0%) tiers based on your commitment.</p>
+                <span class="text-[10px] font-bold text-yellow-400 tracking-tighter">UP TO 500% CAPPING</span>
+            </div>
+
+            <div class="glass p-8 premium-border hover:bg-white/[0.04] transition">
+                <i data-lucide="share-2" class="text-blue-400 w-12 h-12 mb-6"></i>
+                <h4 class="text-xl font-black orbitron mb-4 uppercase">Elite Network</h4>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">Unlock up to 30 levels of referral income. The deeper your network, the higher your protocol rewards.</p>
+                <span class="text-[10px] font-bold text-blue-400 tracking-tighter">30-LEVEL DEPTH</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-24 relative z-10">
+        <div class="glass p-10 md:p-16 premium-border overflow-hidden">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <div class="lg:w-1/3">
+                    <h2 class="text-4xl font-black orbitron italic leading-tight uppercase mb-6">Income <br><span class="text-gradient">Streams</span></h2>
+                    <p class="text-gray-400 text-sm mb-8">Our algorithm ensures a constant flow of BNB through four distinct reward mechanisms.</p>
+                    <button class="px-8 py-4 bg-white text-black font-black orbitron text-[10px] uppercase tracking-widest rounded-full hover:scale-105 transition">Start Earning Now</button>
+                </div>
+                
+                <div class="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 border-l border-white/10 hover:border-cyan-400 transition">
+                        <span class="value-badge mb-4 italic">1.0% Daily</span>
+                        <h5 class="text-lg font-bold orbitron mt-2 mb-2">ROI Engine</h5>
+                        <p class="text-gray-500 text-xs">Automated daily returns credited to your dashboard every 24 hours.</p>
+                    </div>
+                    <div class="p-6 border-l border-white/10 hover:border-blue-400 transition">
+                        <span class="value-badge mb-4 italic">10% Direct</span>
+                        <h5 class="text-lg font-bold orbitron mt-2 mb-2">Falcon Referral</h5>
+                        <h4 class="text-[10px] text-gray-400 mb-2">30 LEVELS UNLOCKED</h4>
+                        <p class="text-gray-500 text-xs">Earn instantly from your team's deposits and reinvestments.</p>
+                    </div>
+                    <div class="p-6 border-l border-white/10 hover:border-purple-400 transition">
+                        <span class="value-badge mb-4 italic">V1 - V6 Ranks</span>
+                        <h5 class="text-lg font-bold orbitron mt-2 mb-2">Elite Leadership</h5>
+                        <p class="text-gray-500 text-xs">Achieve ranks like Elite Falcon to unlock massive performance bonuses.</p>
+                    </div>
+                    <div class="p-6 border-l border-white/10 hover:border-yellow-400 transition">
+                        <span class="value-badge mb-4 italic">0.011 BNB</span>
+                        <h5 class="text-lg font-bold orbitron mt-2 mb-2">Onboarding Gift</h5>
+                        <p class="text-gray-500 text-xs">Welcome bonus for high-tier initial deposits to accelerate growth.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-4xl mx-auto px-6 py-24 relative z-10 text-center">
+        <h2 class="text-3xl font-black orbitron mb-12 uppercase italic">Protocol <span class="text-gradient">Intel</span></h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            <div class="glass p-6 group hover:border-cyan-500/50 transition">
+                <h6 class="font-bold text-cyan-400 mb-2 text-sm uppercase">Minimum Participation?</h6>
+                <p class="text-gray-400 text-xs">Start with just 0.01 BNB. 0.8 BNB unlocks Premium ROI.</p>
+            </div>
+            <div class="glass p-6 group hover:border-cyan-500/50 transition">
+                <h6 class="font-bold text-cyan-400 mb-2 text-sm uppercase">Withdrawal Frequency?</h6>
+                <p class="text-gray-400 text-xs">Instant 24/7 withdrawals directly to your connected Web3 wallet.</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="scripts.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
