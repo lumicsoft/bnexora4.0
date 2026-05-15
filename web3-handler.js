@@ -419,26 +419,20 @@ window.fetchBlockchainHistory = async function(type) {
 
 async function fetchAllData(address) {
     try {
-        // 1. Address se User ID nikalna (Contract function)
-        const userId = await window.contract.addressToId(address);
+        // --- 1. DIRECT ADDRESS SE DETAILS NIKALNA ---
+        // Humne userId wala step hata diya hai kyunki ab contract address se details dega
+        const details = await window.contract.getUserDetails(address);
         
-        if (userId.eq(0)) {
-            console.log("User ID is 0, not registered.");
-            return;
-        }
-
-        // 2. User ID se details nikalna
-        const details = await window.contract.getUserDetails(userId);
-        
-        // --- 3. DASHBOARD SYNC (Har ek ID ko address ke data se bharna) ---
+        // --- 2. DASHBOARD SYNC ---
         
         // Header & Profile
-        updateText('user-id-display', userId.toString());
+        // Agar details mein ID abhi bhi aa rahi hai toh use dikhayenge
+        updateText('user-id-display', details.id ? details.id.toString() : "N/A");
         updateText('connect-btn', address.substring(0,6) + "..." + address.substring(38));
         updateText('rank-display', "Rank: " + details.rank.toString());
         updateText('current-rank-header', "Rank: " + details.rank.toString());
 
-        // Referral Link (Address based link)
+        // Referral Link (Address based link - No change needed here)
         const refUrl = window.location.origin + window.location.pathname.replace('index1.html', 'register.html') + "?ref=" + address;
         const refInput = document.getElementById('refURL');
         if(refInput) refInput.value = refUrl;
@@ -448,7 +442,9 @@ async function fetchAllData(address) {
         updateText('total-income', income);
         updateText('total-income-display', income);
         updateText('balance-large', income);
-        updateText('matrix-earnings', income + " USDT"); // Defaulting matrix to total as per contract
+        
+        // Aapke contract ke naye structure ke hisaab se Matrix aur Level income set karein
+        updateText('matrix-earnings', income + " USDT"); 
         updateText('level-earnings', "0.00 USDT");
         updateText('direct-earnings', "0.00 USDT");
 
@@ -457,10 +453,12 @@ async function fetchAllData(address) {
         updateText('direct-count', details.partnersCount.toString());
         updateText('team-size', details.teamSize.toString());
         updateText('active-slots-count', details.activeSlotsCount + "/12");
-        updateText('referrer-id-display', "ID: " + details.referrerId.toString());
+        
+        // Referrer details
+        updateText('referrer-id-display', "Ref: " + (details.referrerId ? details.referrerId.toString() : "Direct"));
 
     } catch (e) {
-        console.error("Fetch Data Error:", e);
+        console.error("Fetch Data Error (Address Mode):", e);
     }
 }
 window.loadMatrixData = async function(level) {
