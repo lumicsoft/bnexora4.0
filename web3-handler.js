@@ -1,5 +1,5 @@
 let provider, signer, contract, usdtContract;
-const CONTRACT_ADDRESS = "0x4fa6985d153e4a876ad7A20900017C1224B0eAF4"; 
+const CONTRACT_ADDRESS = "0x4fa6985d153e4a876ad7A20900017C1224B0eAF4"; 
 const USDT_ADDRESS = "0x3B66b1E08F55AF26c8eA14a73dA64b6bC8D799dE"; // Testnet USDT
 
 window.userData = {
@@ -21,443 +21,400 @@ const CONTRACT_ABI = [
     "function usersXMatrixReferrals(address userAddress, uint8 level) public view returns(address[] memory referrals)",
     "function isUserSlotActive(uint256 userId, uint8 slot) public view returns (bool)",
     "event Registration(uint256 indexed userId, uint256 indexed referrerId, address indexed userAddress)",
-    "event Upgrade(uint256 indexed userId, uint256 indexed newReferrerId, uint8 level)"
+    "event Upgrade(uint256 indexed userId, uint256 indexed newReferrerId, uint8 level)",
 ];
 
 const USDT_ABI = [
-    "function approve(address spender, uint256 amount) external returns (bool)",
-    "function allowance(address owner, address spender) external view returns (uint256)",
-    "function balanceOf(address account) external view returns (uint256)"
+    "function approve(address spender, uint256 amount) external returns (bool)",
+    "function allowance(address owner, address spender) external view returns (uint256)",
+    "function balanceOf(address account) external view returns (uint256)"
 ];
 
 // --- 1. NEW: AUTO-FILL LOGIC ---
 function checkReferralURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const refAddr = urlParams.get('ref');
-    const refField = document.getElementById('reg-referrer');
+    const urlParams = new URLSearchParams(window.location.search);
+    const refAddr = urlParams.get('ref');
+    const refField = document.getElementById('reg-referrer');
 
-    if (refAddr && ethers.utils.isAddress(refAddr) && refField) {
-        refField.value = refAddr;
-        console.log("Referral address auto-filled:", refAddr);
-    }
+    if (refAddr && ethers.utils.isAddress(refAddr) && refField) {
+        refField.value = refAddr;
+        console.log("Referral address auto-filled:", refAddr);
+    }
 }
 
 // --- INITIALIZATION ---
 async function init() {
-    checkReferralURL();
-    if (window.ethereum) {
-        try {
-            provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            
-            window.signer = provider.getSigner();
-            signer = window.signer;
-            window.contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-            contract = window.contract;
+    checkReferralURL();
+    if (window.ethereum) {
+        try {
+            provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            
+            window.signer = provider.getSigner();
+            signer = window.signer;
+            window.contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+            contract = window.contract;
 
-            if (accounts && accounts.length > 0) {
-                if (localStorage.getItem('manualLogout') !== 'true') {
-                    await setupApp(accounts[0]);
-                } else {
-                    updateNavbar(accounts[0]);
-                }
-            }
-        } catch (error) { 
-            console.error("Init Error", error); 
-        }
-    } else { 
-        alert("Wallet not detected! Please open this site inside Trust Wallet or MetaMask browser."); 
-    }
+            if (accounts && accounts.length > 0) {
+                if (localStorage.getItem('manualLogout') !== 'true') {
+                    await setupApp(accounts[0]);
+                } else {
+                    updateNavbar(accounts[0]);
+                }
+            }
+        } catch (error) { 
+            console.error("Init Error", error); 
+        }
+    } else { 
+        alert("Wallet not detected! Please open this site inside Trust Wallet or MetaMask browser."); 
+    }
 }
 
 
 window.handleBuyPackage = async function(pkgId) {
-    try {
-       
-        const selectedPkg = packageData.find(p => p.id === pkgId);
-        
-        if (!selectedPkg) {
-            alert("Package not found!");
-            return;
-        }
+    try {
+        const selectedPkg = packageData.find(p => p.id === pkgId);
+        if (!selectedPkg) {
+            alert("Package not found!");
+            return;
+        }
 
-        const price = ethers.utils.parseUnits(selectedPkg.price.toString(), 18);
-        console.log(`Buying ${selectedPkg.name}: ${selectedPkg.price} USDT`);
+        const price = ethers.utils.parseUnits(selectedPkg.price.toString(), 18);
+        console.log(`Buying ${selectedPkg.name}: ${selectedPkg.price} USDT`);
 
-        const usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, window.signer);
-        const userAddress = await window.signer.getAddress();
-        
-     
-        const allowance = await usdtContract.allowance(userAddress, CONTRACT_ADDRESS);
-        
-     
-        if (allowance.lt(price)) {
-            console.log("Approving exact amount:", selectedPkg.price, "USDT");
-            
-           
-            const btn = document.querySelector(`button[onclick*='handleBuyPackage(${pkgId})']`);
-            if(btn) btn.innerText = "APPROVING...";
-
-            const approveTx = await usdtContract.approve(CONTRACT_ADDRESS, price);
-            await approveTx.wait();
-        }
-        
-        const tx = await window.contract.buyPackage(pkgId);
-        await tx.wait();
-        
-        alert(`${selectedPkg.name} purchased successfully!`);
-        location.reload();
-        
-    } catch (err) { 
-        console.error("Purchase Error:", err);
-       
-        if (err.code === 4001) {
-            alert("Transaction cancelled by user.");
-        } else {
-            alert("Purchase failed: " + (err.reason || err.message));
-        }
-        location.reload();
-    }
+        const usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, window.signer);
+        const userAddress = await window.signer.getAddress();
+        
+        const allowance = await usdtContract.allowance(userAddress, CONTRACT_ADDRESS);
+        
+        if (allowance.lt(price)) {
+            console.log("Approving exact amount:", selectedPkg.price, "USDT");
+            const btn = document.querySelector(`button[onclick*='handleBuyPackage(${pkgId})']`);
+            if(btn) btn.innerText = "APPROVING...";
+            const approveTx = await usdtContract.approve(CONTRACT_ADDRESS, price);
+            await approveTx.wait();
+        }
+        
+        const tx = await window.contract.buyPackage(pkgId);
+        await tx.wait();
+        
+        alert(`${selectedPkg.name} purchased successfully!`);
+        location.reload();
+        
+    } catch (err) { 
+        console.error("Purchase Error:", err);
+        if (err.code === 4001) {
+            alert("Transaction cancelled by user.");
+        } else {
+            alert("Purchase failed: " + (err.reason || err.message));
+        }
+        location.reload();
+    }
 }
+
 window.handleWithdraw = async function() {
-    try {
-        const tx = await contract.withdraw();
-        await tx.wait();
-        alert("Withdrawal successful!");
-        location.reload();
-    } catch (err) { alert("Withdraw failed: " + (err.reason || err.message)); }
+    try {
+        const tx = await contract.withdraw();
+        await tx.wait();
+        alert("Withdrawal successful!");
+        location.reload();
+    } catch (err) { alert("Withdraw failed: " + (err.reason || err.message)); }
 }
+
 window.handleClaimRewards = async function() {
-    const btn = document.getElementById('claim-btn');
-    try {
-        if(btn) { 
-            btn.disabled = true; 
-            btn.innerText = "PROCESSING..."; 
-        }
+    const btn = document.getElementById('claim-btn');
+    try {
+        if(btn) { 
+            btn.disabled = true; 
+            btn.innerText = "PROCESSING..."; 
+        }
 
-        const tx = await window.contract.claimAllIncomes();
-        console.log("Claiming rewards... TX:", tx.hash);
-        
-        await tx.wait();
-        
-        alert("Success! Rewards added to your main balance.");
-        
-        if(typeof fetchAllData === 'function') {
-            const address = await window.signer.getAddress();
-            await fetchAllData(address); 
-        }
+        const tx = await window.contract.claimAllIncomes();
+        console.log("Claiming rewards... TX:", tx.hash);
+        
+        await tx.wait();
+        
+        alert("Success! Rewards added to your main balance.");
+        
+        if(typeof fetchAllData === 'function') {
+            const address = await window.signer.getAddress();
+            await fetchAllData(address); 
+        }
 
-       
-        if(typeof window.updatePendingRewardsUI === 'function') {
-            await window.updatePendingRewardsUI();
-        } else if(btn) {
-            btn.disabled = false;
-            btn.innerText = "CLAIM ALL NOW";
-        }
-        
-    } catch (err) {
-        console.error("Claim Error:", err);
-        
-        if (!(err instanceof TypeError && err.message.includes("updatePendingRewardsUI"))) {
-            alert("Claim failed. Check console for details.");
-        }
-
-        if(typeof window.updatePendingRewardsUI === 'function') {
-            window.updatePendingRewardsUI();
-        } else if(btn) {
-            btn.disabled = false;
-            btn.innerText = "CLAIM ALL NOW";
-        }
-    }
+        if(typeof window.updatePendingRewardsUI === 'function') {
+            await window.updatePendingRewardsUI();
+        } else if(btn) {
+            btn.disabled = false;
+            btn.innerText = "CLAIM ALL NOW";
+        }
+        
+    } catch (err) {
+        console.error("Claim Error:", err);
+        if (!(err instanceof TypeError && err.message.includes("updatePendingRewardsUI"))) {
+            alert("Claim failed. Check console for details.");
+        }
+        if(typeof window.updatePendingRewardsUI === 'function') {
+            await window.updatePendingRewardsUI();
+        } else if(btn) {
+            btn.disabled = false;
+            btn.innerText = "CLAIM ALL NOW";
+        }
+    }
 }
 
 window.handleLogin = async function() {
-    try {
-        if (!window.ethereum) return alert("Please install MetaMask!");
-        const accounts = await provider.send("eth_requestAccounts", []);
-        if (accounts.length === 0) return;
-        
-        const userAddress = accounts[0]; 
-        signer = provider.getSigner();
-        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-        localStorage.removeItem('manualLogout');
-        
-        const userData = await contract.users(userAddress);
-        if (userData.id.gt(0)) {
-            if(typeof showLogoutIcon === "function") showLogoutIcon(userAddress);
-            window.location.href = "index1.html";
-        } else {
-            alert("This wallet is not registered!");
-            window.location.href = "register.html";
-        }
-    } catch (err) {
-        console.error("Login Error:", err);
-        alert("Login failed! Make sure you are on BSC Testnet.");
-    }
+    try {
+        if (!window.ethereum) return alert("Please install MetaMask!");
+        const accounts = await provider.send("eth_requestAccounts", []);
+        if (accounts.length === 0) return;
+        
+        const userAddress = accounts[0]; 
+        signer = provider.getSigner();
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        localStorage.removeItem('manualLogout');
+        
+        // FIX: Replaced .users with .isUserExists
+        const isRegistered = await contract.isUserExists(userAddress);
+        if (isRegistered) {
+            if(typeof showLogoutIcon === "function") showLogoutIcon(userAddress);
+            window.location.href = "index1.html";
+        } else {
+            alert("This wallet is not registered!");
+            window.location.href = "register.html";
+        }
+    } catch (err) {
+        console.error("Login Error:", err);
+        alert("Login failed! Make sure you are on BSC Testnet.");
+    }
 }
 
 window.handleRegister = async function() {
-    try {
-        if (!window.ethereum) {
-            alert("MetaMask or Trust Wallet not found!");
-            return;
-        }
+    try {
+        if (!window.ethereum) {
+            alert("MetaMask or Trust Wallet not found!");
+            return;
+        }
 
-        const tempProvider = new ethers.providers.Web3Provider(window.ethereum);
-        await tempProvider.send("eth_requestAccounts", []);
-        signer = tempProvider.getSigner();
-        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-        const usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, signer);
-        
-        const userAddress = await signer.getAddress();
-        const refField = document.getElementById('reg-referrer');
-        const referrerAddress = refField ? refField.value.trim() : "";
-        
-     
-        const regAmount = ethers.utils.parseUnits("10", 18);
+        const tempProvider = new ethers.providers.Web3Provider(window.ethereum);
+        await tempProvider.send("eth_requestAccounts", []);
+        signer = tempProvider.getSigner();
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        const usdtContract = new ethers.Contract(USDT_ADDRESS, USDT_ABI, signer);
+        
+        const userAddress = await signer.getAddress();
+        const refField = document.getElementById('reg-referrer');
+        const referrerAddress = refField ? refField.value.trim() : "";
+        
+        const regAmount = ethers.utils.parseUnits("10", 18);
 
-        if (!ethers.utils.isAddress(referrerAddress)) {
-            alert("Please enter a valid Referrer Wallet Address (0x...)");
-            return;
-        }
+        if (!ethers.utils.isAddress(referrerAddress)) {
+            alert("Please enter a valid Referrer Wallet Address (0x...)");
+            return;
+        }
 
-        const btn = document.getElementById('reg-btn');
-        if(btn) {
-            btn.disabled = true;
-            btn.innerText = "PROCESSING...";
-        }
+        const btn = document.getElementById('reg-btn');
+        if(btn) {
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+        }
 
-        const allowance = await usdtContract.allowance(userAddress, CONTRACT_ADDRESS);
-        if (allowance.lt(regAmount)) {
-            if(btn) btn.innerText = "APPROVE 10 USDT...";
-            
-      
-            const estApproveGas = await usdtContract.estimateGas.approve(CONTRACT_ADDRESS, regAmount);
-            
-            const approveTx = await usdtContract.approve(CONTRACT_ADDRESS, regAmount, {
-                gasLimit: estApproveGas.mul(130).div(100) 
-            });
-            await approveTx.wait();
-        }
-      
+        const allowance = await usdtContract.allowance(userAddress, CONTRACT_ADDRESS);
+        if (allowance.lt(regAmount)) {
+            if(btn) btn.innerText = "APPROVE 10 USDT...";
+            const estApproveGas = await usdtContract.estimateGas.approve(CONTRACT_ADDRESS, regAmount);
+            const approveTx = await usdtContract.approve(CONTRACT_ADDRESS, regAmount, {
+                gasLimit: estApproveGas.mul(130).div(100) 
+            });
+            await approveTx.wait();
+        }
 
-        if(btn) btn.innerText = "ESTIMATING GAS...";
+        if(btn) btn.innerText = "ESTIMATING GAS...";
 
-        try {
-            const estimatedGas = await contract.estimateGas.register(referrerAddress);
-            const gasLimitWithBuffer = estimatedGas.mul(130).div(100); 
-            
-            console.log("Estimated Gas:", estimatedGas.toString());
-            console.log("Gas with 30% Buffer:", gasLimitWithBuffer.toString());
+        try {
+            // FIX: Using registrationByAddress as per new contract
+            const tx = await contract.registrationByAddress(referrerAddress);
+            alert("Transaction sent! Waiting for confirmation...");
+            const receipt = await tx.wait();
 
-            if(btn) btn.innerText = "CONFIRM IN WALLET...";
+            if (receipt.status === 1) {
+                alert("Registration Successful!");
+                window.location.href = "index1.html";
+            }
+        } catch (gasErr) {
+            console.error("Gas Estimation Failed:", gasErr);
+            throw new Error("Transaction would fail. Check if you have enough BNB for gas.");
+        }
 
-            const tx = await contract.register(referrerAddress, {
-                gasLimit: gasLimitWithBuffer
-            });
-
-            alert("Transaction sent! Waiting for confirmation...");
-            const receipt = await tx.wait();
-
-            if (receipt.status === 1) {
-                alert("Registration Successful!");
-                window.location.href = "index1.html";
-            }
-        } catch (gasErr) {
-            console.error("Gas Estimation Failed:", gasErr);
-            throw new Error("Transaction would fail. Check if you are already registered or have enough BNB for gas.");
-        }
-
-    } catch (err) {
-        console.error("Detailed Error:", err);
-        const btn = document.getElementById('reg-btn');
-        if(btn) {
-            btn.disabled = false;
-            btn.innerText = "REGISTER NOW";
-        }
-        alert("Error: " + (err.reason || err.message));
-    }
+    } catch (err) {
+        console.error("Detailed Error:", err);
+        const btn = document.getElementById('reg-btn');
+        if(btn) {
+            btn.disabled = false;
+            btn.innerText = "REGISTER NOW";
+        }
+        alert("Error: " + (err.reason || err.message));
+    }
 }
 
 window.handleLogout = function() {
-    if (confirm("Do you want to disconnect?")) {
-        localStorage.setItem('manualLogout', 'true');
-        signer = null;
-        contract = null;
-        window.location.href = "index.html";
-    }
+    if (confirm("Do you want to disconnect?")) {
+        localStorage.setItem('manualLogout', 'true');
+        signer = null;
+        contract = null;
+        window.location.href = "index.html";
+    }
 }
 
 function showLogoutIcon(address) {
-    const btn = document.getElementById('connect-btn');
-    const logout = document.getElementById('logout-icon-btn');
-    if (btn) btn.innerText = address.substring(0, 6) + "..." + address.substring(38);
-    if (logout) { logout.style.display = 'flex'; }
+    const btn = document.getElementById('connect-btn');
+    const logout = document.getElementById('logout-icon-btn');
+    if (btn) btn.innerText = address.substring(0, 6) + "..." + address.substring(38);
+    if (logout) { logout.style.display = 'flex'; }
 }
 
 // --- APP SETUP ---
 async function setupApp(address) {
-    try {
-        const network = await provider.getNetwork();
-        if (network.chainId !== 97) { 
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x61' }],
-                });
-            } catch (err) {
-                alert("Please switch to BSC testnet!");
-                return; 
-            }
-        }
-        
-        const userData = await contract.users(address);
-        const isRegistered = userData.id.gt(0);
-        const path = window.location.pathname;
+    try {
+        const network = await provider.getNetwork();
+        if (network.chainId !== 97) { 
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x61' }],
+                });
+            } catch (err) {
+                alert("Please switch to BSC testnet!");
+                return; 
+            }
+        }
+        
+        // FIX: Replaced .users with .isUserExists
+        const isRegistered = await contract.isUserExists(address);
+        const path = window.location.pathname;
 
-        window.userData.isRegistered = isRegistered;
+        window.userData.isRegistered = isRegistered;
 
-       
-        if (!isRegistered) {
-            if (!path.includes('register') && !path.includes('login')) {
-                window.location.href = "register.html"; 
-                return; 
-            }
-        } else {
-           
-            if (path.includes('register') || path.includes('login') || path.endsWith('index.html')) {
-                window.location.href = "index1.html";
-                return;
-            }
-        }
+        if (!isRegistered) {
+            if (!path.includes('register') && !path.includes('login')) {
+                window.location.href = "register.html"; 
+                return; 
+            }
+        } else {
+            if (path.includes('register') || path.includes('login') || path.endsWith('index.html')) {
+                window.location.href = "index1.html";
+                return;
+            }
+        }
 
-        updateNavbar(address);
-        showLogoutIcon(address); 
+        updateNavbar(address);
+        showLogoutIcon(address); 
 
-        
-        if (path.includes('index1')) {
-            await fetchAllData(address);
-        }
+        if (path.includes('index1')) {
+            await fetchAllData(address);
+        }
 
-if (path.includes('referral') || path.includes('deposits')) {
-    if (typeof initReferralPage === "function") {
-        await initReferralPage();
-    } else if (typeof initTeamPage === "function") {
-        await initTeamPage();
-    } else {
-        console.log("Page specific init function not found - Skipping");
-    }
-}
-       
-        if (path.includes('deposits')) {
-           
-            if (typeof initTeamPage === "function") {
-                await initTeamPage();
-            } else {
-               
-                await fetchAllData(address); 
-                if(window.loadTree) window.loadTree(address);
-            }
-        }
+        if (path.includes('referral') || path.includes('deposits')) {
+            if (typeof initReferralPage === "function") {
+                await initReferralPage();
+            } else if (typeof initTeamPage === "function") {
+                await initTeamPage();
+            }
+        }
+        
+        if (path.includes('deposits')) {
+            if (typeof initTeamPage === "function") {
+                await initTeamPage();
+            } else {
+                await fetchAllData(address); 
+                if(window.loadTree) window.loadTree(address);
+            }
+        }
 
-        if (path.includes('history')) {
-            window.showHistory('deposit');
-        }
+        if (path.includes('history')) {
+            window.showHistory('deposit');
+        }
 
-    } catch (e) {
-        console.error("SetupApp Error:", e);
-    }
+    } catch (e) {
+        console.error("SetupApp Error:", e);
+    }
 }
 // --- HISTORY LOGIC ---
 window.showHistory = async function(type) {
-    const container = document.getElementById('history-container');
-    if(!container) return;
-    container.innerHTML = `<div class="p-10 text-center text-yellow-500 italic">Blockchain Syncing...</div>`;
-    
-    const logs = await window.fetchBlockchainHistory(type);
-    if (logs.length === 0) {
-        container.innerHTML = `<div class="p-10 text-center text-gray-500">No transactions found.</div>`;
-        return;
-    }
+    const container = document.getElementById('history-container');
+    if(!container) return;
+    container.innerHTML = `<div class="p-10 text-center text-yellow-500 italic">Blockchain Syncing...</div>`;
+    
+    const logs = await window.fetchBlockchainHistory(type);
+    if (logs.length === 0) {
+        container.innerHTML = `<div class="p-10 text-center text-gray-500">No transactions found.</div>`;
+        return;
+    }
 
-    container.innerHTML = logs.map(item => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 flex justify-between items-center">
-            <div>
-                <h4 class="font-bold ${item.color}">${item.type}</h4>
-                <p class="text-xs text-gray-400">${item.date} | ${item.time}</p>
-            </div>
-            <div class="text-right">
-                <span class="text-lg font-black text-white">${item.amount}</span>
-                <p class="text-[10px] text-gray-500 italic uppercase">Completed</p>
-            </div>
-        </div>
-    `).join('');
+    container.innerHTML = logs.map(item => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4 flex justify-between items-center">
+            <div>
+                <h4 class="font-bold ${item.color}">${item.type}</h4>
+                <p class="text-xs text-gray-400">${item.date} | ${item.time}</p>
+            </div>
+            <div class="text-right">
+                <span class="text-lg font-black text-white">${item.amount}</span>
+                <p class="text-[10px] text-gray-500 italic uppercase">Completed</p>
+            </div>
+        </div>
+    `).join('');
 }
 
 
 window.getIncomeHistory = async (userAddress) => {
-    try {
-        const activeContract = window.contract || contract;
-        if (!activeContract) {
-            console.error("Contract not initialized");
-            return [];
-        }
+    try {
+        const activeContract = window.contract || contract;
+        if (!activeContract) return [];
 
-        console.log("Fetching history for:", userAddress);
-        const historyData = await activeContract.getUserIncomeHistory(userAddress);
-        
-        if (!historyData || historyData.length === 0) return [];
+        const historyData = await activeContract.getUserIncomeHistory(userAddress);
+        if (!historyData || historyData.length === 0) return [];
 
-     
-        const formattedHistory = historyData.map((record, index) => {
-            try {
-               
-                const amountRaw = record.amount || record[0];
-                const typeRaw = record.incomeType || record[1];
-                const timeRaw = record.time || record[2];
-                const fromRaw = record.from || record[3];
-                const pkgRaw = record.packageId || record[4];
+        const formattedHistory = historyData.map((record, index) => {
+            try {
+                const amountRaw = record.amount || record[0];
+                const typeRaw = record.incomeType || record[1];
+                const timeRaw = record.time || record[2];
+                const fromRaw = record.from || record[3];
+                const pkgRaw = record.packageId || record[4];
 
-                return {
-                    amount: ethers.utils.formatEther(amountRaw.toString()),
-                    incomeType: Number(typeRaw.toString()),
-                    time: Number(timeRaw.toString()),
-                    from: fromRaw,
-                    packageId: Number(pkgRaw.toString()),
-                    index: index + 1
-                };
-            } catch (innerErr) {
-                console.warn("Record mapping error at index", index, innerErr);
-                return null;
-            }
-        }).filter(item => item !== null);
+                return {
+                    amount: ethers.utils.formatEther(amountRaw.toString()),
+                    incomeType: Number(typeRaw.toString()),
+                    time: Number(timeRaw.toString()),
+                    from: fromRaw,
+                    packageId: Number(pkgRaw.toString()),
+                    index: index + 1
+                };
+            } catch (innerErr) { return null; }
+        }).filter(item => item !== null);
 
-        return formattedHistory.sort((a, b) => b.time - a.time);
-        
-    } catch (e) {
-        console.error("Critical Web3 Handler History Error:", e);
-        return [];
-    }
+        return formattedHistory.sort((a, b) => b.time - a.time);
+    } catch (e) { return []; }
 }
+
 window.fetchBlockchainHistory = async function(type) {
-    try {
-        const activeSigner = window.signer || signer;
-        const activeContract = window.contract || contract;
-        const address = await activeSigner.getAddress();
-        const rawHistory = await activeContract.getUserHistory(address);
-        
-        return rawHistory.map(item => {
-            const dt = new Date(item.timestamp.toNumber() * 1000);
-            return {
-                type: item.txType,
-                amount: format(item.amount),
-                date: dt.toLocaleDateString(),
-                time: dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                ts: item.timestamp.toNumber(),
-                color: 'text-cyan-400'
-            };
-        }).sort((a, b) => b.ts - a.ts);
-    } catch (e) { return []; }
+    try {
+        const activeSigner = window.signer || signer;
+        const activeContract = window.contract || contract;
+        const address = await activeSigner.getAddress();
+        const rawHistory = await activeContract.getUserHistory(address);
+        
+        return rawHistory.map(item => {
+            const dt = new Date(item.timestamp.toNumber() * 1000);
+            return {
+                type: item.txType,
+                amount: format(item.amount),
+                date: dt.toLocaleDateString(),
+                time: dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                ts: item.timestamp.toNumber(),
+                color: 'text-cyan-400'
+            };
+        }).sort((a, b) => b.ts - a.ts);
+    } catch (e) { return []; }
 }
 
 async function fetchAllData(address) {
@@ -467,33 +424,38 @@ async function fetchAllData(address) {
 
         const details = await contract.getUserDetails(userId);
         
-        // UI Updates
         updateText('user-id-display', "ID: #" + userId.toString());
         updateText('total-income', format(details.totalIncome) + " USDT");
         updateText('direct-count', details.partnersCount.toString());
         updateText('team-size', details.teamSize.toString());
-        updateText('current-rank', "RANK: " + details.rank.toString());
+        
+        // Compatibility with old elements
+        updateText('total-earned', format(details.totalIncome));
+        updateText('balance-large', format(details.totalIncome));
 
-        // Levels check (Level 1 to 12)
         let activeCount = details.activeSlotsCount;
         window.userData.currentLevel = activeCount;
+        window.userData.currentPackageId = activeCount;
 
-        // Referral URL
         const refUrl = `${window.location.origin}/register.html?ref=${address}`;
         const refInput = document.getElementById('refURL');
         if(refInput) refInput.value = refUrl;
 
-    } catch (e) {
-        console.error("Fetch Data Error:", e);
-    }
+        // Try to fetch old structure if exists in ABI
+        try {
+            const data = await contract.getUserTotalData(address);
+            updateText('direct-earnings', format(data.incomes[0]));
+            updateText('level-earnings', format(data.incomes[1]));
+            updateText('matrix-earnings', format(data.incomes[3]));
+        } catch(e) {}
+
+    } catch (e) { console.error("Fetch Data Error:", e); }
 }
 
-// --- MATRIX UI LOGIC ---
 window.loadMatrixData = async function(level) {
     try {
         const userAddress = await signer.getAddress();
         const data = await contract.usersXMatrix(userAddress, level);
-        
         return {
             referrer: data.currentReferrer,
             reinvests: data.reinvestCount.toString(),
@@ -501,206 +463,63 @@ window.loadMatrixData = async function(level) {
             earnings: format(data.totalEarning),
             team: data.totalTeamSize.toString()
         };
-    } catch (e) {
-        console.error("Matrix Load Error", e);
-    }
+    } catch (e) { return null; }
 }
 
 window.getAllMatrixHistory = async function(userAddr, pkgId) {
-    try {
-        const activeContract = window.contract; 
-        if (!activeContract) throw new Error("Contract not initialized");
-
-        console.log("Fetching history for:", userAddr, "Pkg:", pkgId);
-
-      
-        const history = await activeContract.getAllMatrixHistory(userAddr, pkgId);
-        
-        return history.map(node => ({
-            index: node.index.toString(),
-            filledCount: node.filledCount.toString(),
-            slotA: node.slotA,
-            slotB: node.slotB,
-            slotC: node.slotC
-        }));
-
-    } catch (e) {
-        console.error("Matrix History Fetch Error:", e);
-      
-        return window.fallbackMatrixHistory(userAddr, pkgId);
-    }
-}
-
-
-window.fallbackMatrixHistory = async function(userAddr, pkgId) {
-    const activeContract = window.contract;
-    const indices = []; 
-    return []; 
-}
-async function fetchAllData(address) {
-    try {
-        let activeContract = window.contract || contract;
-        
-        const data = await activeContract.getUserTotalData(address);
-        
-        // --- Dashboard Stats Update ---
-        updateText('user-id-display', "ID: #" + data.stats[0].toString());
-        updateText('balance-large', format(data.stats[1])); 
-        updateText('total-earned', format(data.stats[2]));
-        updateText('income-cap', format(data.stats[3]) + " USDT");
-        updateText('direct-count', data.stats[4].toString());
-        updateText('capping-loss', format(data.stats[5])); 
-        updateText('held-income', format(data.stats[6])); 
-
-        // --- TOTAL INCOME STATISTICS ---
-        
-      
-        updateText('lunar-fund', format(data.stats[7]));
-        
-       
-        updateText('booster-fund', format(data.stats[8]));
-
-      
-        updateText('daily-earnings', format(data.incomes[4]));
-
-        updateText('direct-earnings', format(data.incomes[0]));
-        updateText('level-earnings', format(data.incomes[1]));
-        updateText('single-leg-earnings', format(data.incomes[2])); 
-        updateText('matrix-earnings', format(data.incomes[3]));
-        updateText('reward-earnings', format(data.incomes[5]));
-
-       
-        if(data.incomes[6]) {
-            updateText('fast-track-earnings', format(data.incomes[6]));
-        }
-
-      
-        const refUrl = `${window.location.origin}/register.html?ref=${address}`; 
-        const refInput = document.getElementById('refURL');
-        if(refInput) refInput.value = refUrl;
-
-     
-        try {
-            const pending = await activeContract.getPendingIncomeDetails(address);
-            
-           
-            const pDaily = parseFloat(ethers.utils.formatEther(pending[0]));
-            const pLunar = parseFloat(ethers.utils.formatEther(pending[1]));
-            const pBoxer = parseFloat(ethers.utils.formatEther(pending[2]));
-            
-            
-            const pFastTrack = pending[3] ? parseFloat(ethers.utils.formatEther(pending[3])) : 0;
-
-         
-            const totalP = pDaily + pLunar + pBoxer + pFastTrack;
-            
-          
-            updateText('p-daily-val', pDaily.toFixed(2));
-            updateText('p-lunar-val', pLunar.toFixed(2));
-            updateText('p-boxer-val', pBoxer.toFixed(2));
-            updateText('p-fast-track-val', pFastTrack.toFixed(2)); 
-            
-            const claimText = document.getElementById('pending-claim-text');
-            if(claimText) claimText.innerText = `Pending: ${totalP.toFixed(2)} USDT`;
-            
-          
-            const totalClaimVal = document.getElementById('total-pending-claim');
-            if(totalClaimVal) totalClaimVal.innerText = totalP.toFixed(2);
-            
-           
-            const claimBtn = document.getElementById('claim-btn');
-            if(claimBtn) {
-                claimBtn.disabled = totalP <= 0;
-            }
-            
-        } catch(e) { console.log("Pending sub-fetch error:", e); }
-
-      
-        let maxActive = -1;
-        const activeStatusArray = await activeContract.getUserActivePackages(address);
-        for (let i = 0; i < 12; i++) {
-            if (activeStatusArray[i] === true) maxActive = i;
-        }
-        
-        window.userData.currentPackageId = maxActive;
-        if (typeof renderPackages === "function") renderPackages(maxActive);
-
-       
-        const rankHeader = document.getElementById('current-rank-header');
-        if(rankHeader) {
-            
-            rankHeader.innerText = maxActive >= 0 ? "PACKAGE: G" + maxActive : "PACKAGE: NONE";
-        }
-    } catch (e) { 
-        console.error("Fetch Data Global Error:", e); 
-    }
+    try {
+        const activeContract = window.contract; 
+        const history = await activeContract.getAllMatrixHistory(userAddr, pkgId);
+        return history.map(node => ({
+            index: node.index.toString(),
+            filledCount: node.filledCount.toString(),
+            slotA: node.slotA,
+            slotB: node.slotB,
+            slotC: node.slotC
+        }));
+    } catch (e) { return []; }
 }
 
 window.syncPendingRewards = async function() {
-    try {
-        const activeContract = window.contract || contract;
-        const address = await signer.getAddress();
-        
-       
-        const pending = await activeContract.getPendingIncomeDetails(address);
-        
-        const pDaily = parseFloat(ethers.utils.formatEther(pending.pendingDailyPool || pending[0]));
-        const pLunar = parseFloat(ethers.utils.formatEther(pending.pendingLunar || pending[1]));
-        const pBoxer = parseFloat(ethers.utils.formatEther(pending.pendingBoxer || pending[2]));
-        
-        
-        const pFastTrack = (pending.pendingFastTrack || pending[3]) ? 
-                           parseFloat(ethers.utils.formatEther(pending.pendingFastTrack || pending[3])) : 0;
-        
-        const totalPending = pDaily + pLunar + pBoxer + pFastTrack;
+    try {
+        const activeContract = window.contract || contract;
+        const address = await signer.getAddress();
+        const pending = await activeContract.getPendingIncomeDetails(address);
+        
+        const pDaily = parseFloat(ethers.utils.formatEther(pending[0]));
+        const pLunar = parseFloat(ethers.utils.formatEther(pending[1]));
+        const pBoxer = parseFloat(ethers.utils.formatEther(pending[2]));
+        const pFastTrack = pending[3] ? parseFloat(ethers.utils.formatEther(pending[3])) : 0;
+        
+        const totalPending = pDaily + pLunar + pBoxer + pFastTrack;
+        updateText('total-pending-claim', totalPending.toFixed(2));
+        updateText('p-daily', pDaily.toFixed(2));
+        updateText('p-lunar', pLunar.toFixed(2));
+        updateText('p-booster', pBoxer.toFixed(2));
+        updateText('p-fast-track', pFastTrack.toFixed(2));
 
-       
-        updateText('total-pending-val', totalPending.toFixed(2));
-        updateText('p-daily-small', pDaily.toFixed(2));
-        updateText('p-lunar-small', pLunar.toFixed(2));
-        updateText('p-boxer-small', pBoxer.toFixed(2));
-        
-     
-        updateText('p-fast-track-small', pFastTrack.toFixed(2)); 
-
-       
-        const claimBtn = document.getElementById('claim-btn');
-        if (claimBtn) {
-            if (totalPending <= 0) {
-                claimBtn.disabled = true;
-                claimBtn.innerText = "NO REWARDS";
-                claimBtn.classList.add('opacity-50', 'grayscale');
-            } else {
-                claimBtn.disabled = false;
-                claimBtn.innerText = "CLAIM ALL NOW";
-                claimBtn.classList.remove('opacity-50', 'grayscale');
-            }
-        }
-    } catch (e) {
-        console.error("Sync Pending Error:", e);
-    }
+        const claimBtn = document.getElementById('claim-btn');
+        if (claimBtn) claimBtn.disabled = totalPending <= 0;
+    } catch (e) {}
 }
-// --- UTILS ---
+
 const format = (val) => {
-    try { 
-        if (!val) return "0.0000"; 
-        return parseFloat(ethers.utils.formatUnits(val, 18)).toFixed(4);
-    } catch (e) { return "0.0000"; }
+    try { 
+        if (!val) return "0.00"; 
+        return parseFloat(ethers.utils.formatUnits(val, 18)).toFixed(2);
+    } catch (e) { return "0.00"; }
 };
 
 const updateText = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
 
 function updateNavbar(addr) {
-    const btn = document.getElementById('connect-btn');
-    if(btn) btn.innerText = addr.substring(0,6) + "..." + addr.substring(38);
+    const btn = document.getElementById('connect-btn');
+    if(btn) btn.innerText = addr.substring(0,6) + "..." + addr.substring(38);
 }
 
 if (window.ethereum) {
-    window.ethereum.on('accountsChanged', () => {
-        localStorage.removeItem('manualLogout');
-        location.reload();
-    });
-    window.ethereum.on('chainChanged', () => location.reload());
+    window.ethereum.on('accountsChanged', () => { location.reload(); });
+    window.ethereum.on('chainChanged', () => location.reload());
 }
 
 window.addEventListener('load', init);
