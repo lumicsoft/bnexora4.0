@@ -460,49 +460,51 @@ window.fetchBlockchainHistory = async function(type) {
     } catch (e) { return []; }
 }
 
-// --- TREE & MATRIX ---
-window.load2x2Tree = async function(userAddr) {
-    try {
-        const tree = await contract.getTeamTree2x2(userAddr);
-        const updateNode = (id, addr) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            if (addr && addr !== ethers.constants.AddressZero) {
-                el.innerText = addr.substring(0, 6) + "...";
-                el.classList.add('active-node');
-            } else {
-                el.innerText = "Empty";
-                el.classList.remove('active-node');
-            }
-        };
-        updateNode('lvl1-L', tree.level1_Left);
-        updateNode('lvl1-R', tree.level1_Right);
-        updateNode('lvl2-1', tree.level2_Pos1);
-        updateNode('lvl2-2', tree.level2_Pos2);
-        updateNode('lvl2-3', tree.level2_Pos3);
-        updateNode('lvl2-4', tree.level2_Pos4);
-    } catch (e) { console.error("Tree Error", e); }
-}
-// --- SPECIFIC MATRIX NODE FETCH ---
-window.loadSpecificMatrixNode = async function(pkgId, index) {
-    try {
-        const activeContract = window.contract || contract;
-        
-        const data = await activeContract.getMatrixTree(pkgId, index);
+async function fetchAllData(address) {
+    try {
+        const userId = await contract.addressToId(address);
+        if (userId.eq(0)) return;
 
-       
-        return {
-            owner: data.ownerAddr,
-            filledCount: data.filledCount.toNumber(),
-            rebirths: data.ownerRebirths.toNumber(),
-            slots: [data.slotA, data.slotB, data.slotC]
-        };
-    } catch (e) {
-        console.error("Matrix Tree Fetch Error:", e);
-        return null;
-    }
+        const details = await contract.getUserDetails(userId);
+        
+        // UI Updates
+        updateText('user-id-display', "ID: #" + userId.toString());
+        updateText('total-income', format(details.totalIncome) + " USDT");
+        updateText('direct-count', details.partnersCount.toString());
+        updateText('team-size', details.teamSize.toString());
+        updateText('current-rank', "RANK: " + details.rank.toString());
+
+        // Levels check (Level 1 to 12)
+        let activeCount = details.activeSlotsCount;
+        window.userData.currentLevel = activeCount;
+
+        // Referral URL
+        const refUrl = `${window.location.origin}/register.html?ref=${address}`;
+        const refInput = document.getElementById('refURL');
+        if(refInput) refInput.value = refUrl;
+
+    } catch (e) {
+        console.error("Fetch Data Error:", e);
+    }
 }
 
+// --- MATRIX UI LOGIC ---
+window.loadMatrixData = async function(level) {
+    try {
+        const userAddress = await signer.getAddress();
+        const data = await contract.usersXMatrix(userAddress, level);
+        
+        return {
+            referrer: data.currentReferrer,
+            reinvests: data.reinvestCount.toString(),
+            heldForUpgrade: format(data.heldTokenForUpgrade),
+            earnings: format(data.totalEarning),
+            team: data.totalTeamSize.toString()
+        };
+    } catch (e) {
+        console.error("Matrix Load Error", e);
+    }
+}
 
 window.getAllMatrixHistory = async function(userAddr, pkgId) {
     try {
