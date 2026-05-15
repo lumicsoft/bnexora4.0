@@ -3,208 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix History | RebirthKey</title>
+    <title>Direct Referrals | Bnexora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #ffd700; --bg-dark: #060a08; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-dark); color: white; 
-            background-image: radial-gradient(circle at 50% 0%, #1a2e23, #060a08 80%);
-            min-height: 100vh;
+        :root { --primary: #9d34da; --secondary: #eb1e8c; --dark-bg: #0d0118; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            background-image: radial-gradient(circle at 10% 20%, rgba(157, 52, 218, 0.1) 0%, transparent 40%);
         }
-        .orbitron { font-family: 'Orbitron', sans-serif; }
-        
-        .matrix-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .glass-card {
+            background: rgba(25, 10, 45, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
         }
-
-        .matrix-card:hover {
-            border-color: var(--gold);
-            background: rgba(255, 215, 0, 0.07);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        .table-row:hover { background: rgba(255, 255, 255, 0.03); }
+        .status-badge {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 800;
         }
-
-        .slot-circle {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: #222;
-        }
-        .slot-filled {
-            background: var(--gold);
-            box-shadow: 0 0 12px var(--gold);
-        }
-        .animate-spin-slow { animation: spin 3s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="pb-24">
+<body class="p-4 md:p-8">
 
-    <div id="header-placeholder"></div>
-    <div id="nav-placeholder"></div>
-
-    <main class="max-w-6xl mx-auto px-4 pt-10">
-        
-        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
-                <h3 class="orbitron font-black text-2xl text-white border-l-4 border-yellow-500 pl-4 uppercase tracking-tighter">Matrix <span class="text-yellow-500">History</span></h3>
-                <p class="text-[10px] text-gray-500 font-bold ml-5 mt-1 tracking-widest uppercase">Real-time Node Monitoring</p>
+                <h1 class="text-3xl font-black italic tracking-tight">DIRECT <span class="text-pink-500">PARTNERS</span></h1>
+                <p class="text-gray-400 text-sm mt-1">Manage and track your primary network performance</p>
             </div>
-            
-            <div class="flex gap-4 w-full md:w-auto">
-                <div class="flex-grow md:w-56">
-                    <p class="text-[9px] text-gray-500 uppercase font-black mb-2 ml-1">Select Matrix Package</p>
-                    <select id="pkg-selector" onchange="loadMatrixHistory()" class="w-full bg-black/60 border border-yellow-500/30 text-yellow-500 text-xs p-3 rounded-xl outline-none cursor-pointer hover:border-yellow-500 transition-colors">
-                        <option value="0">Package $5 (G0)</option>
-                        <option value="1">Package $44 (G1)</option>
-                        <option value="2">Package $65 (G2)</option>
-                        <option value="3">Package $106 (G3)</option>
-                        <option value="4">Package $187 (G4)</option>
-                        <option value="5">Package $348 (G5)</option>
-                        <option value="6">Package $669 (G6)</option>
-                        <option value="7">Package $1310 (G7)</option>
-                    </select>
-                </div>
+            <div class="flex gap-3">
+                <a href="index1.html" class="glass-card px-6 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-white/5 transition">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                </a>
             </div>
         </div>
 
-        <div id="history-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Quick Stats Area -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-card p-6 bg-gradient-to-br from-purple-600/10 to-transparent">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Total Directs</p>
+                <h2 class="text-3xl font-black" id="total-directs-count">0</h2>
             </div>
+            <div class="glass-card p-6 bg-gradient-to-br from-pink-600/10 to-transparent">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Active Network</p>
+                <h2 class="text-3xl font-black text-emerald-400">Online ●</h2>
+            </div>
+            <div class="glass-card p-6 border-l-4 border-pink-500">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Registration Mode</p>
+                <h2 class="text-xl font-black">Wallet Address</h2>
+            </div>
+        </div>
 
-    </main>
+        <!-- Referrals Table -->
+        <div class="glass-card overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 class="font-bold flex items-center gap-2">
+                    <i data-lucide="users" class="text-pink-500 w-5 h-5"></i>
+                    Partner List
+                </h3>
+                <span class="text-[10px] text-gray-500 italic">Data synced with Smart Contract</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-[10px] text-gray-400 uppercase tracking-widest border-b border-white/5">
+                            <th class="p-6">User ID</th>
+                            <th class="p-6">Wallet Address</th>
+                            <th class="p-6 text-center">Current Level</th>
+                            <th class="p-6 text-center">Team Size</th>
+                            <th class="p-6 text-center">Rank</th>
+                            <th class="p-6">Reg. Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referrals-table-body">
+                        <!-- Data will load here dynamically -->
+                        <tr>
+                            <td colspan="6" class="p-20 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-4">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Scanning Blockchain...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-    <div id="footer-placeholder"></div>
-
-    <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
-    let myAddress = "";
+        async function loadReferrals() {
+            lucide.createIcons();
+            if (typeof init === 'function') await init();
 
-    // 1. Address Validation: Check if it's not the Zero Address
-    function isAddressValid(addr) {
-        if (!addr || addr === null || addr === undefined) return false;
-        const zero = "0x0000000000000000000000000000000000000000";
-        return addr.toString().toLowerCase() !== zero.toLowerCase();
-    }
-
-    // 2. Individual Slot Renderer: Format address and status
-    function renderSlot(label, addr) {
-        const isFilled = isAddressValid(addr);
-        return `
-            <div class="flex items-center gap-3 bg-black/40 p-3 rounded-xl border ${isFilled ? 'border-yellow-500/20' : 'border-white/5'}">
-                <div class="slot-circle ${isFilled ? 'slot-filled' : ''}"></div>
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-center mb-0.5">
-                        <p class="text-[8px] text-gray-500 font-black uppercase">${label}</p>
-                        ${isFilled ? '<span class="text-[7px] bg-yellow-500/10 text-yellow-500 px-1.5 rounded border border-yellow-500/20 font-bold">FILLED</span>' : ''}
-                    </div>
-                    <p class="text-[10px] font-mono truncate ${isFilled ? 'text-yellow-500' : 'text-gray-200'}">
-                        ${isFilled ? addr.substring(0,10)+"..."+addr.substring(addr.length - 4) : 'Awaiting Spillover...'}
-                    </p>
-                </div>
-            </div>
-        `;
-    }
-
-    // 3. Main UI Loader
-    async function loadMatrixHistory() {
-        const pkgId = document.getElementById('pkg-selector').value;
-        const grid = document.getElementById('history-grid');
-        
-        grid.innerHTML = `
-            <div class="col-span-full text-center py-20">
-                <i data-lucide="loader-2" class="w-10 h-10 animate-spin mx-auto mb-4 text-yellow-500"></i>
-                <p class="orbitron text-xs">RETRIEVING BLOCKCHAIN DATA...</p>
-            </div>
-        `;
-        if(window.lucide) lucide.createIcons();
-
-        try {
-            // Web3-handler.js se data fetch karna
-            const history = await window.getAllMatrixHistory(myAddress, pkgId);
-            grid.innerHTML = "";
-
-            if(!history || history.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-20 bg-black/20 rounded-3xl border border-dashed border-gray-800"><p class="text-gray-500 orbitron text-xs uppercase">No Nodes Found in this Package</p></div>`;
-                return;
-            }
-
-            // REVERSE history taaki Latest (Active) node sabse pehle dikhe
-            // Contract me history.length-1 wala element latest hota hai
-            const reversedHistory = [...history].reverse();
-
-            reversedHistory.forEach((node, idx) => {
-                // Calculation for filled slots
-                let count = 0;
-                if (isAddressValid(node.slotA)) count++;
-                if (isAddressValid(node.slotB)) count++;
-                if (isAddressValid(node.slotC)) count++;
-
-                // Pehla card (जो reversed list me 0 index par hai) hamesha Active hoga
-                const isActive = (idx === 0);
-                const isFull = (count >= 3);
-
-                const card = document.createElement('div');
-                card.className = `matrix-card p-6 ${isActive ? 'border-yellow-500 bg-yellow-500/5' : 'border-white/10 opacity-80'}`;
+            try {
+                const userAddress = await signer.getAddress();
                 
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <span class="text-[9px] font-black orbitron uppercase ${isActive ? 'text-yellow-500 animate-pulse' : 'text-gray-500'}">
-                                ${isActive ? '● LIVE NODE' : 'COMPLETED NODE'}
-                            </span>
-                            <h4 class="text-xl font-black orbitron text-white">#${parseInt(node.index)}</h4>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-[9px] text-gray-500 font-black orbitron uppercase">Filled Slots</span>
-                            <p class="text-sm font-black ${isFull ? 'text-green-500' : 'text-yellow-500'}">${count} / 3</p>
-                        </div>
-                    </div>
+                // 1. Get List of Direct Partner Addresses
+                const partners = await contract.getDirectPartnerAddresses(userAddress);
+                document.getElementById('total-directs-count').innerText = partners.length;
 
-                    <div class="space-y-3">
-                        ${renderSlot("Position A", node.slotA)}
-                        ${renderSlot("Position B", node.slotB)}
-                        ${renderSlot("Position C", node.slotC)}
-                    </div>
+                const tableBody = document.getElementById('referrals-table-body');
+                tableBody.innerHTML = '';
 
-                    <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center">
-                        <span class="text-[8px] text-gray-600 font-bold uppercase tracking-widest">Global Index: ${node.index}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-black ${isActive ? 'text-yellow-500' : 'text-green-600'}">
-                                ${isActive ? 'ACTIVE' : 'REBIRTHED'}
-                            </span>
-                            <i data-lucide="${isActive ? 'zap' : 'check-circle'}" class="w-4 h-4 ${isActive ? 'text-yellow-500' : 'text-green-600'}"></i>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                if (partners.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-500 text-xs">No direct partners found yet.</td></tr>';
+                    return;
+                }
 
-            if(window.lucide) lucide.createIcons();
-        } catch(e) {
-            console.error(e);
-            grid.innerHTML = `<p class="col-span-full text-center text-red-500 py-10 orbitron text-xs">Error: Could not load data. Check console.</p>`;
+                // 2. Loop through each partner to get their individual details
+                for (let partnerAddr of partners) {
+                    const details = await contract.getUserDetailsByAddress(partnerAddr);
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'table-row border-b border-white/5 transition';
+                    
+                    const date = new Date(details.registrationTimestamp * 1000).toLocaleDateString();
+                    
+                    row.innerHTML = `
+                        <td class="p-6">
+                            <span class="bg-white/5 px-3 py-1 rounded-lg text-xs font-bold">#${details.id}</span>
+                        </td>
+                        <td class="p-6">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-mono text-gray-300">${partnerAddr.substring(0,6)}...${partnerAddr.substring(38)}</span>
+                                <span class="status-badge w-fit mt-1">Verified</span>
+                            </div>
+                        </td>
+                        <td class="p-6 text-center">
+                            <span class="text-pink-500 font-black">Lvl ${details.activeSlotsCount}</span>
+                        </td>
+                        <td class="p-6 text-center">
+                            <span class="font-bold text-gray-300">${details.teamSize} Members</span>
+                        </td>
+                        <td class="p-6 text-center">
+                            <span class="px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded text-[10px] font-bold text-purple-400">V${details.rank}</span>
+                        </td>
+                        <td class="p-6">
+                            <span class="text-xs text-gray-500">${date}</span>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+
+            } catch (err) {
+                console.error("Referral Page Error:", err);
+            }
         }
-    }
 
-    async function initPage() {
-        if(!window.signer) {
-            setTimeout(initPage, 1000);
-            return;
-        }
-        myAddress = await window.signer.getAddress();
-        loadMatrixHistory();
-    }
-
-    window.addEventListener('load', initPage);
-</script>
+        window.addEventListener('load', loadReferrals);
+    </script>
 </body>
 </html>
