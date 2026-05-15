@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Dashboard | Bnexora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Ethers library load karna zaroori hai -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="text/javascript"></script>
+    
+    <!-- FIX: Updated Ethers library link to Cloudflare CDN for stability -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="text/javascript"></script>
+    
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -181,7 +183,15 @@
         // Syncing UI with Bnexora Contract
         async function loadUI() {
             try {
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                
+                // Safety check for Ethers library loading
+                if (typeof ethers === 'undefined') {
+                    console.error("Ethers library is not defined. Retrying in 1s...");
+                    setTimeout(loadUI, 1000);
+                    return;
+                }
+
                 // 1. Initial Web3 Connection
                 if (typeof init === 'function') {
                     await init();
