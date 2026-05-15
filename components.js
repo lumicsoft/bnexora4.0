@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", async function () {
     // 1. Auth Page Check
     const isAuthPage = document.getElementById('auth-page') || 
-                       window.location.pathname.includes('register.php') || 
-                       window.location.pathname.includes('login.php');
+                       window.location.pathname.includes('register.html') || 
+                       window.location.pathname.includes('login.html');
 
     // 2. Inject Dots Background
     const dotsHTML = `<div class="dots-container"><div class="dots dots-white"></div><div class="dots dots-cyan"></div></div>`;
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // 4. Inject Navbar (Desktop & Mobile)
     const navHTML = `
         <nav class="max-w-7xl mx-auto px-4 md:px-6 py-6 flex justify-between items-center relative z-[100]">
-            <div class="flex items-center gap-2 md:gap-4 cursor-pointer group" onclick="location.href='index1.php'">
+            <div class="flex items-center gap-2 md:gap-4 cursor-pointer group" onclick="location.href='index1.html'">
                 <div class="relative w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
                     <div class="absolute inset-0 bg-cyan-500/20 blur-xl group-hover:bg-cyan-500/40 transition-all"></div>
                     <!-- Logo Container adjusted for Image -->
@@ -48,11 +48,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             </div>
             
             <div class="hidden md:flex bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-1 shadow-2xl">
-                <button class="nav-btn-new" onclick="location.href='index1.php'">Dashboard</button>
-                <button class="nav-btn-new" onclick="location.href='deposits.php'">Position</button>
-                <button class="nav-btn-new" onclick="location.href='referral.php'">Referral</button>
-                <button class="nav-btn-new" onclick="location.href='leadership.php'">Leadership</button>
-                <button class="nav-btn-new" onclick="location.href='history.php'">History</button>
+                <button class="nav-btn-new" onclick="location.href='index1.html'">Dashboard</button>
+                <button class="nav-btn-new" onclick="location.href='deposits.html'">Position</button>
+                <button class="nav-btn-new" onclick="location.href='referral.html'">Referral</button>
+                <button class="nav-btn-new" onclick="location.href='leadership.html'">Leadership</button>
+                <button class="nav-btn-new" onclick="location.href='history.html'">History</button>
             </div>
             
             <div class="relative flex flex-col items-center">
@@ -84,17 +84,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     const mobileNavHTML = `
         <div class="fixed bottom-6 left-4 right-4 md:hidden z-[9999]">
             <div class="bg-black/90 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] flex justify-between items-center px-6 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-                <a href="index1.php" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('index1.php') ? 'text-cyan-400' : 'text-gray-500'}">
+                <a href="index1.html" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('index1.html') ? 'text-cyan-400' : 'text-gray-500'}">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <span class="text-[7px] font-bold orbitron uppercase">Home</span>
                 </a>
-                <a href="deposits.php" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('deposits.php') ? 'text-cyan-400' : 'text-gray-500'}">
+                <a href="deposits.html" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('deposits.html') ? 'text-cyan-400' : 'text-gray-500'}">
                     <i data-lucide="gem" class="w-5 h-5"></i>
                     <span class="text-[7px] font-bold orbitron uppercase">Position</span>
                 </a>
 
                 <div class="relative -top-10 flex flex-col items-center">
-                    <a href="referral.php" class="relative group">
+                    <a href="referral.html" class="relative group">
                         <div class="absolute inset-0 bg-cyan-500 blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
                         <!-- Centered Mobile Logo -->
                         <div class="relative w-16 h-16 bg-gradient-to-tr from-white via-gray-100 to-gray-400 rounded-full flex items-center justify-center border-4 border-[#050505] shadow-2xl p-3">
@@ -106,11 +106,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     </a>
                 </div>
 
-                <a href="leadership.php" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('leadership.php') ? 'text-cyan-400' : 'text-gray-500'}">
+                <a href="leadership.html" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('leadership.html') ? 'text-cyan-400' : 'text-gray-500'}">
                     <i data-lucide="award" class="w-5 h-5"></i>
                     <span class="text-[7px] font-bold orbitron uppercase">Rank</span>
                 </a>
-                <a href="history.php" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('history.php') ? 'text-cyan-400' : 'text-gray-500'}">
+                <a href="history.html" class="flex flex-col items-center gap-1 transition-all ${window.location.pathname.includes('history.html') ? 'text-cyan-400' : 'text-gray-500'}">
                     <i data-lucide="history" class="w-5 h-5"></i>
                     <span class="text-[7px] font-bold orbitron uppercase">History</span>
                 </a>
