@@ -8,22 +8,35 @@ window.userData = {
 };
 
 const CONTRACT_ABI = [
-    // Naya Registration Function (Address wala)
+    // --- Registration Functions ---
     "function registrationByAddress(address referrerAddress) external",
-    "function registrationExt(uint256 referrerId) external",
+    "function registrationExt(address referrer) external",
+
+    // --- User Status & Mapping ---
     "function isUserExists(address user) public view returns (bool)",
     "function addressToId(address) view returns (uint256)",
     "function idToAddress(uint256) view returns (address)",
-    "function levelTokenCost(uint8) view returns (uint256)",
+
+    // --- Dashboard Data (Address Based) ---
+    "function getUserDetailsByAddress(address userAdd) public view returns (uint256 id, address referrerAddress, uint256 referrerId, uint256 partnersCount, uint8 activeSlotsCount, uint256 teamSize, uint256 registrationTimestamp, uint256 totalIncome, uint8 rank)",
     "function getActiveLevelsCount(address userAddress) public view returns (uint8)",
-    "function getUserDetails(address userAdd) public view returns (uint id, address referrerAddress, uint referrerId, uint partnersCount, uint8 activeSlotsCount, uint teamSize, uint registrationTimestamp, uint256 totalIncome, uint8 rank)",
-    "function usersXMatrix(address userAddress, uint8 level) public view returns(address currentReferrer, uint reinvestCount, uint heldTokenForUpgrade, uint lastSpillUnderReceiverIndex, uint totalTeamSize, uint256 totalEarning)",
+    "function getDirectPartnerAddresses(address userAddress) public view returns (address[] memory)",
+    "function isUserSlotActiveByAddress(address userAddress, uint8 slot) public view returns (bool)",
+
+    // --- Matrix & Level Data ---
+    "function levelTokenCost(uint8) view returns (uint256)",
+    "function usersXMatrix(address userAddress, uint8 level) public view returns(address currentReferrer, uint256 reinvestCount, uint256 heldTokenForUpgrade, uint256 lastSpillUnderReceiverIndex, uint256 totalTeamSize, uint256 totalEarning)",
     "function usersXMatrixReferrals(address userAddress, uint8 level) public view returns(address[] memory referrals)",
-    "function isUserSlotActive(uint256 userId, uint8 slot) public view returns (bool)",
+
+    // --- System Stats ---
+    "function totalProjectInvestment() view returns (uint256)",
+
+    // --- Events ---
     "event Registration(uint256 indexed userId, uint256 indexed referrerId, address indexed userAddress)",
     "event Upgrade(uint256 indexed userId, uint256 indexed newReferrerId, uint8 level)",
+    "event RankUpdated(address indexed user, uint8 newRank)",
+    "event Spillover(uint256 indexed referrerId, uint256 indexed receiverId, uint8 level, uint256 cycle, uint8 virtualSpot)"
 ];
-
 const USDT_ABI = [
     "function approve(address spender, uint256 amount) external returns (bool)",
     "function allowance(address owner, address spender) external view returns (uint256)",
