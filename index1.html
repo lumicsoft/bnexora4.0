@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Dashboard | Bnexora</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js" type="text/javascript"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -39,11 +40,6 @@
             transform: translateY(-2px);
             box-shadow: 0 0 20px rgba(235, 30, 140, 0.4);
         }
-        .slot-locked {
-            opacity: 0.5;
-            filter: grayscale(1);
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -61,8 +57,9 @@
                             <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bnexora" class="rounded-2xl bg-dark-bg" alt="avatar">
                         </div>
                         <div>
-                            <h2 class="font-extrabold text-lg" id="rank-display">Loading...</h2>
-                            <p class="text-xs text-gray-400">ID: <span class="text-white font-bold" id="user-id-display">0000</span></p>
+                            <!-- current-rank-header sync with web3-handler -->
+                            <h2 class="font-extrabold text-lg" id="current-rank-header">Rank: --</h2>
+                            <p class="text-xs text-gray-400">ID: <span class="text-white font-bold" id="user-id-display">#0000</span></p>
                         </div>
                     </div>
                     <div class="bg-white/5 p-2 rounded-xl border border-white/10 flex items-center gap-2">
@@ -73,23 +70,19 @@
 
                 <div class="grid grid-cols-2 gap-3 mb-6">
                     <div class="bg-white/5 p-3 rounded-2xl text-center">
-                        <p class="text-[9px] text-gray-400 uppercase font-bold">Invited By</p>
-                        <p class="text-sm font-bold text-pink-500" id="referrer-id-display">ID --</p>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold">Direct Partners</p>
+                        <p class="text-sm font-bold text-pink-500" id="direct-count">0</p>
                     </div>
                     <div class="bg-white/5 p-3 rounded-2xl text-center">
-                        <p class="text-[9px] text-gray-400 uppercase font-bold">Active Slots</p>
-                        <p class="text-sm font-bold text-emerald-400" id="active-slots-count">0/12</p>
+                        <p class="text-[9px] text-gray-400 uppercase font-bold">Total Team</p>
+                        <p class="text-sm font-bold text-emerald-400" id="team-size">0</p>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between mt-auto bg-gradient-to-r from-purple-900/40 to-transparent p-4 rounded-2xl border-l-4 border-pink-500">
-                    <div>
-                        <p class="text-2xl font-black" id="partners-count">0</p>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Direct Partners</p>
-                    </div>
-                    <div>
-                        <p class="text-2xl font-black text-right" id="team-size">0</p>
-                        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Total Team</p>
+                <div class="flex items-center justify-center mt-auto bg-gradient-to-r from-purple-900/40 to-transparent p-4 rounded-2xl border-l-4 border-pink-500">
+                    <div class="text-center">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Available Balance</p>
+                        <p class="text-2xl font-black" id="balance-large">0.00</p>
                     </div>
                 </div>
             </div>
@@ -102,26 +95,27 @@
                             Affiliate Link
                         </h3>
                         <div class="bg-black/40 border border-white/10 p-4 rounded-2xl flex items-center justify-between">
-                            <input type="text" id="refURL" readonly class="bg-transparent text-xs text-pink-400 font-medium truncate w-full outline-none" value="Loading...">
+                            <input type="text" id="refURL" readonly class="bg-transparent text-xs text-pink-400 font-medium truncate w-full outline-none" value="Syncing...">
                             <button onclick="copyRef()" class="text-white hover:text-pink-500 transition ml-2"><i data-lucide="copy" class="w-4 h-4"></i></button>
                         </div>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-4 italic">Invite others using your ID to earn direct commissions and spillover.</p>
+                    <p class="text-[10px] text-gray-500 mt-4 italic">Invite others to earn 100% decentralized commissions.</p>
                 </div>
 
                 <div class="glass-card p-6 bg-gradient-to-br from-pink-500/10 to-purple-600/10 border-pink-500/30">
                     <div class="flex justify-between items-start">
-                        <h3 class="font-bold">Wallet Income</h3>
+                        <h3 class="font-bold">Total Earnings</h3>
                         <div class="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center border border-yellow-500/50">
                             <span class="text-yellow-500 font-black text-xl">$</span>
                         </div>
                     </div>
                     <div class="mt-6">
-                        <p class="text-4xl font-black tracking-tight" id="total-income-display">0.00</p>
+                        <!-- id="total-income" matches sync logic -->
+                        <p class="text-4xl font-black tracking-tight" id="total-income">0.00</p>
                         <p class="text-xs text-gray-400 font-bold mt-1">Total USDT Earned</p>
                     </div>
                     <div class="mt-6 flex gap-2">
-                        <button class="btn-action flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider" onclick="alert('Withdrawal is automatic to your wallet')">Auto Payouts</button>
+                        <button class="btn-action flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-wider" onclick="location.reload()">Refresh Stats</button>
                     </div>
                 </div>
             </div>
@@ -129,16 +123,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="glass-card p-5 border-b-4 border-purple-600">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Last Level Income</p>
-                <p class="text-xl font-black text-white" id="last-income-val">-- USDT</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Matrix Income</p>
+                <p class="text-xl font-black text-white" id="matrix-earnings">0.00 USDT</p>
             </div>
             <div class="glass-card p-5 border-b-4 border-pink-600">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Matrix Structure</p>
-                <p class="text-xl font-black text-white">14 Nodes S3</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Level Income</p>
+                <p class="text-xl font-black text-white" id="level-earnings">0.00 USDT</p>
             </div>
             <div class="glass-card p-5 border-b-4 border-blue-600">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Blockchain</p>
-                <p class="text-xl font-black text-white">BSC Testnet</p>
+                <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Direct Income</p>
+                <p class="text-xl font-black text-white" id="direct-earnings">0.00 USDT</p>
             </div>
             <div class="glass-card p-5 border-b-4 border-emerald-600">
                 <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">System Status</p>
@@ -161,37 +155,24 @@
 
     </div>
 
-    <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
-
-        // Global functions for HTML buttons
         window.copyRef = () => {
             const copyText = document.getElementById("refURL");
+            if(copyText.value === "Syncing...") return;
             copyText.select();
             document.execCommand("copy");
             alert("Referral link copied!");
         };
 
-        // Initializing UI with Web3 Data
-        async function loadUI() {
-            try {
-                lucide.createIcons();
-                // 1. Initial Web3 Connection
-                const address = await web3Handler.init();
-                
-                // 2. Fetch All Dashboard Data
-                await web3Handler.setupApp(address); 
-                
-                // 3. Load Transaction History automatically
-                if(window.showHistory) window.showHistory('income');
-
-            } catch (err) {
-                console.error("Dashboard Load Error:", err);
+        async function initDashboard() {
+            lucide.createIcons();
+            if (typeof init === 'function') {
+                await init();
             }
         }
 
-        window.addEventListener('load', loadUI);
+        window.addEventListener('load', initDashboard);
     </script>
 </body>
 </html>
