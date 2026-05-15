@@ -34,7 +34,7 @@ async function initWeb3() {
     if (window.ethereum) {
         try {
             provider = new ethers.BrowserProvider(window.ethereum);
-            const accounts = await provider.send("eth_requestAccounts", []);
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             signer = await provider.getSigner();
             
             contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
@@ -48,7 +48,7 @@ async function initWeb3() {
     return null;
 }
 
-// --- 1. LOGIN LOGIC ---
+// --- 1. LOGIN LOGIC (Admin & User Friendly) ---
 window.handleLogin = async function() {
     try {
         const address = await initWeb3();
@@ -56,13 +56,15 @@ window.handleLogin = async function() {
 
         localStorage.removeItem('manualLogout');
         
-        const registered = await contract.isUserExists(address); [cite: 1]
+        // Contract logic: Check if user exists (Works for ID 1 and all others)
+        const registered = await contract.isUserExists(address);
+        
         if (registered) {
             if(typeof showLogoutIcon === "function") showLogoutIcon(address);
-            window.location.href = "index1.php"; [cite: 1]
+            window.location.href = "index1.php";
         } else {
             alert("This wallet is not registered!");
-            window.location.href = "register.html"; [cite: 1]
+            window.location.href = "register.html";
         }
     } catch (err) {
         console.error("Login Error:", err);
@@ -81,7 +83,7 @@ window.handleRegister = async function() {
 
         if (!referrerId || isNaN(referrerId)) return alert("Please enter a valid Referrer ID (Number)");
 
-        const regAmount = ethers.parseUnits("10", 18); [cite: 1]
+        const regAmount = ethers.parseUnits("10", 18); 
         const btn = document.getElementById('reg-btn');
         if(btn) { btn.disabled = true; btn.innerText = "PROCESSING..."; }
 
@@ -93,11 +95,11 @@ window.handleRegister = async function() {
         }
 
         if(btn) btn.innerText = "CONFIRMING...";
-        const tx = await contract.registrationExt(referrerId); [cite: 1]
+        const tx = await contract.registrationExt(referrerId); 
         await tx.wait();
 
         localStorage.removeItem('manualLogout');
-        window.location.href = "index1.php"; [cite: 1]
+        window.location.href = "index1.php";
     } catch (err) {
         console.error("Reg Error:", err);
         const btn = document.getElementById('reg-btn');
@@ -159,7 +161,7 @@ async function fetchAllData(address) {
         const userId = await contract.addressToId(address);
         if (userId == 0n) return;
         
-        const d = await contract.getUserDetails(userId); [cite: 1]
+        const d = await contract.getUserDetails(userId); 
         
         updateText('user-id-display', "ID: " + userId.toString());
         updateText('referrer-id-display', "Ref ID: " + d[2].toString());
@@ -173,7 +175,7 @@ async function fetchAllData(address) {
         if (document.getElementById('refURL')) document.getElementById('refURL').value = refUrl;
 
         for(let i = 1; i <= 12; i++) {
-            const isActive = await contract.isUserSlotActive(userId, i); [cite: 1]
+            const isActive = await contract.isUserSlotActive(userId, i); 
             const slotCard = document.getElementById(`slot-card-${i}`);
             if(slotCard && isActive) slotCard.classList.remove('slot-locked');
         }
@@ -185,8 +187,8 @@ window.loadTreeData = async function(level) {
     try {
         await initWeb3();
         const userAddr = await signer.getAddress();
-        const stats = await contract.usersXMatrix(userAddr, level); [cite: 1]
-        const referrals = await contract.usersXMatrixReferrals(userAddr, level); [cite: 1]
+        const stats = await contract.usersXMatrix(userAddr, level); 
+        const referrals = await contract.usersXMatrixReferrals(userAddr, level); 
         
         updateText('slot-id-header', "Level " + level);
         updateText('cycle-display', stats[1].toString());
@@ -211,12 +213,11 @@ async function setupApp(address) {
             await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0x61' }] });
         }
         
-        const userDataFromContract = await contract.users(address);
-        const isRegistered = userDataFromContract.registered;
-        window.userData.isRegistered = isRegistered;
+        const registered = await contract.isUserExists(address);
+        window.userData.isRegistered = registered;
 
         const path = window.location.pathname;
-        if (!isRegistered) {
+        if (!registered) {
             if (!path.includes('register') && !path.includes('login')) window.location.href = "register.html";
         } else {
             if (path.includes('register') || path.includes('login') || path.endsWith('index.html') || path === '/') {
@@ -236,7 +237,6 @@ window.handleLogout = function() {
     }
 }
 
-// --- Helper Utils ---
 const format = (val) => {
     try { if (!val) return "0.0000"; return parseFloat(ethers.formatUnits(val, 18)).toFixed(4); } catch (e) { return "0.0000"; }
 };
@@ -245,13 +245,11 @@ function getRankName(r) { const ranks = ["No Rank", "Bronze", "Silver", "Gold", 
 function updateNavbar(addr) { const btn = document.getElementById('connect-btn'); if(btn) btn.innerText = addr.substring(0,6) + "..." + addr.substring(38); }
 function showLogoutIcon(address) { const logout = document.getElementById('logout-icon-btn'); if (logout) { logout.style.display = 'flex'; } }
 
-// --- Listeners ---
 if (window.ethereum) {
     window.ethereum.on('accountsChanged', () => { localStorage.removeItem('manualLogout'); location.reload(); });
     window.ethereum.on('chainChanged', () => location.reload());
 }
 
-// Start auto-fill immediately
 const checkReferralURL = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const ref = urlParams.get('ref');
