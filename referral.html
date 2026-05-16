@@ -114,7 +114,7 @@
                 // 1. Get List of Direct Partner Addresses
                 const partners = await contract.getDirectPartnerAddresses(userAddress);
                 document.getElementById('total-directs-count').innerText = partners.length;
-                document.getElementById('all-team').innerText = details.teamSize.toString();
+                document.getElementById('my-team').innerText = details.teamSize.length;
 
                 const tableBody = document.getElementById('referrals-table-body');
                 tableBody.innerHTML = '';
