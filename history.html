@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaction History | Bnexora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js" type="text/javascript"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -32,21 +32,9 @@
             border-radius: 24px;
         }
         .table-row:hover { background: rgba(255, 255, 255, 0.03); }
-        .badge-income {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.2);
-        }
-        .badge-upgrade {
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-        }
-        .badge-spill {
-            background: rgba(245, 158, 11, 0.1);
-            color: #f59e0b;
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
+        .badge-income { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-upgrade { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        .badge-spill { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -84,17 +72,16 @@
                             <th class="p-5">Level</th>
                             <th class="p-5">Date & Time</th>
                             <th class="p-5">Tx Hash</th>
-                            <th class="p-5">User Address</th>
+                            <th class="p-5">From User ID / Address</th>
                             <th class="p-5 text-right">Income Type / Value</th>
                         </tr>
                     </thead>
                     <tbody id="tx-table-body">
-                        <!-- Loading State -->
                         <tr>
                             <td colspan="6" class="p-20 text-center text-gray-500">
                                 <div class="flex flex-col items-center gap-4">
                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
-                                    <p class="text-xs font-bold uppercase tracking-widest">Reading Blockchain Events...</p>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Scanning Blockchain Logs...</p>
                                 </div>
                             </td>
                         </tr>
@@ -107,71 +94,117 @@
 
     <script src="web3-handler.js"></script>
     <script>
+        // ABI aapke contract ke events ke variables ke sequence ke exact mutabik hai
+        const LOCAL_ABI = [
+            "function addressToId(address) view returns (uint256)",
+            "function idToAddress(uint256) view returns (address)",
+            "function levelTokenCost(uint8) view returns (uint256)",
+            "event Registration(uint256 indexed userId, uint256 indexed referrerId, address userAddress)",
+            "event Upgrade(uint256 indexed userId, uint256 indexed newReferrerId, uint8 level)",
+            "event Spillover(uint256 indexed referrerId, uint256 indexed receiverId, uint8 level, uint256 cycle, uint8 virtualSpot)"
+        ];
+
         async function loadTransactions() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
-            if (typeof init === 'function') await init();
+            
+            // Web3 core configuration fallback check
+            if (typeof provider === 'undefined' && window.ethereum) {
+                window.provider = new ethers.providers.Web3Provider(window.ethereum);
+                window.signer = window.provider.getSigner();
+            }
 
             try {
                 const userAddress = await signer.getAddress();
+                const activeContract = new ethers.Contract(CONTRACT_ADDRESS, LOCAL_ABI, signer);
+                
+                const myIdBtn = await activeContract.addressToId(userAddress);
+                const myId = myIdBtn.toNumber();
+
                 const tableBody = document.getElementById('tx-table-body');
                 tableBody.innerHTML = '';
 
-                // Blockchain se past 5000 blocks ke events target karna
                 const currentBlock = await provider.getBlockNumber();
-                const fromBlock = currentBlock - 5000 > 0 ? currentBlock - 5000 : 0;
+                // Safe node retrieval block span limit
+                const fromBlock = currentBlock - 4500 > 0 ? currentBlock - 4500 : 0;
 
-                // 1. Filters setup karna (Registration, Upgrade, Spillover)
-                const filterReg = contract.filters.Registration(null, null, userAddress);
-                const filterUpgrade = contract.filters.Upgrade(null, null, null);
-                const filterSpill = contract.filters.Spillover(null, null, null, null, null);
+                // Event logs fetch logic without targeted indexing constraints
+                const logsReg = await activeContract.queryFilter("Registration", fromBlock, currentBlock);
+                const logsUpgrade = await activeContract.queryFilter("Upgrade", fromBlock, currentBlock);
+                const logsSpill = await activeContract.queryFilter("Spillover", fromBlock, currentBlock);
 
-                // Events query karna
-                const logsReg = await contract.queryFilter(filterReg, fromBlock, currentBlock);
-                const logsUpgrade = await contract.queryFilter(filterUpgrade, fromBlock, currentBlock);
-                const logsSpill = await contract.queryFilter(filterSpill, fromBlock, currentBlock);
+                let reportData = [];
 
-                // Saare logs ko ek single array mein combine karna
-                let allEvents = [...logsReg, ...logsUpgrade, ...logsSpill];
-                
-                // Block numbers ke mutabik sort karna (Latest Pehle)
-                allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+                // 1. Process Registrations (Where current user is the Referrer)
+                for (let log of logsReg) {
+                    if (log.args.referrerId.toNumber() === myId) {
+                        reportData.push({
+                            blockNumber: log.blockNumber,
+                            txHash: log.transactionHash,
+                            level: 1,
+                            fromUserAddress: log.args.userAddress,
+                            fromUserId: log.args.userId.toString(),
+                            type: "Direct Income",
+                            badgeClass: "badge-income"
+                        });
+                    }
+                }
 
-                if (allEvents.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-500 text-xs">No recent contract events found.</td></tr>';
+                // 2. Process Upgrades (Linear hierarchy processing check)
+                for (let log of logsUpgrade) {
+                    const targetUser = await activeContract.idToAddress(log.args.userId);
+                    if (log.args.newReferrerId.toNumber() === myId) {
+                        reportData.push({
+                            blockNumber: log.blockNumber,
+                            txHash: log.transactionHash,
+                            level: log.args.level,
+                            fromUserAddress: targetUser,
+                            fromUserId: log.args.userId.toString(),
+                            type: "Level Upgrade",
+                            badgeClass: "badge-upgrade"
+                        });
+                    }
+                }
+
+                // 3. Process Spillovers (Matrix structure receiver validation match)
+                for (let log of logsSpill) {
+                    if (log.args.receiverId.toNumber() === myId) {
+                        const senderAddress = await activeContract.idToAddress(log.args.referrerId);
+                        reportData.push({
+                            blockNumber: log.blockNumber,
+                            txHash: log.transactionHash,
+                            level: log.args.level,
+                            fromUserAddress: senderAddress,
+                            fromUserId: log.args.referrerId.toString(),
+                            type: `Spillover (Spot ${log.args.virtualSpot})`,
+                            badgeClass: "badge-spill"
+                        });
+                    }
+                }
+
+                // Newest transactions sorting execution
+                reportData.sort((a, b) => b.blockNumber - a.blockNumber);
+
+                if (reportData.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-500 text-xs">No income data matched for this wallet in recent blocks.</td></tr>';
                     return;
                 }
 
                 let indexCounter = 1;
 
-                for (let event of allEvents) {
-                    const block = await provider.getBlock(event.blockNumber);
-                    const txDate = new Date(block.timestamp * 1000);
+                for (let data of reportData) {
+                    const blockDetails = await provider.getBlock(data.blockNumber);
+                    const txDate = new Date(blockDetails.timestamp * 1000);
                     
-                    // Date aur Time formatted formats mein
                     const formattedDate = txDate.toLocaleDateString('en-US');
                     const formattedTime = txDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-                    let levelDisplay = "Lvl 1";
-                    let typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-income">Direct Income</span>`;
-                    let userDisplay = event.args.userAddress || "0x...000";
-                    
-                    if (event.event === "Upgrade") {
-                        levelDisplay = `Lvl ${event.args.level}`;
-                        typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-upgrade">Level Upgrade</span>`;
-                        userDisplay = await contract.idToAddress(event.args.userId);
-                    } else if (event.event === "Spillover") {
-                        levelDisplay = `Lvl ${event.args.level}`;
-                        typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-spill">Spillover</span>`;
-                        userDisplay = await contract.idToAddress(event.args.receiverId);
-                    }
-
-                    // Mapping cost matching from levels logic
-                    let costText = "10.00 USDT";
-                    if(event.args.level) {
+                    // Dynamically parse package value cost based on target event levels
+                    let valueCost = "10.00 USDT";
+                    if (data.level > 1) {
                         try {
-                            const costRaw = await contract.levelTokenCost(event.args.level);
-                            costText = parseFloat(ethers.utils.formatUnits(costRaw, 18)).toFixed(2) + " USDT";
-                        } catch(e) { costText = "-- USDT"; }
+                            const rawCost = await activeContract.levelTokenCost(data.level);
+                            valueCost = parseFloat(ethers.utils.formatUnits(rawCost, 18)).toFixed(2) + " USDT";
+                        } catch (err) { valueCost = "-- USDT"; }
                     }
 
                     const row = document.createElement('tr');
@@ -179,7 +212,7 @@
 
                     row.innerHTML = `
                         <td class="p-5 font-bold text-gray-500">${String(indexCounter++).padStart(2, '0')}</td>
-                        <td class="p-5 font-black text-pink-400">${levelDisplay}</td>
+                        <td class="p-5 font-black text-pink-400">Lvl ${data.level}</td>
                         <td class="p-5">
                             <div class="flex flex-col">
                                 <span class="font-bold">${formattedDate}</span>
@@ -187,17 +220,20 @@
                             </div>
                         </td>
                         <td class="p-5 font-mono text-purple-400">
-                            <a href="https://testnet.bscscan.com/tx/${event.transactionHash}" target="_blank" class="hover:underline">
-                                ${event.transactionHash.substring(0,6)}...${event.transactionHash.substring(60)}
+                            <a href="https://testnet.bscscan.com/tx/${data.txHash}" target="_blank" class="hover:underline">
+                                ${data.txHash.substring(0,6)}...${data.txHash.substring(60)}
                             </a>
                         </td>
-                        <td class="p-5 font-mono text-gray-400">
-                            ${userDisplay.substring(0,6)}...${userDisplay.substring(38)}
+                        <td class="p-5">
+                            <div class="flex flex-col">
+                                <span class="text-white font-black">ID: ${data.fromUserId}</span>
+                                <span class="font-mono text-[10px] text-gray-500 mt-0.5">${data.fromUserAddress.substring(0,6)}...${data.fromUserAddress.substring(38)}</span>
+                            </div>
                         </td>
                         <td class="p-5 text-right">
                             <div class="flex flex-col items-end gap-1">
-                                <span class="font-black text-white">${costText}</span>
-                                ${typeBadge}
+                                <span class="font-black text-white">${valueCost}</span>
+                                <span class="px-2 py-1 rounded text-[10px] font-bold ${data.badgeClass}">${data.type}</span>
                             </div>
                         </td>
                     `;
@@ -206,8 +242,8 @@
                 lucide.createIcons();
 
             } catch (err) {
-                console.error("Transaction Page Load Error:", err);
-                document.getElementById('tx-table-body').innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 text-xs">Error fetching ledger data from blockchain.</td></tr>';
+                console.error("Ledger rendering error:", err);
+                document.getElementById('tx-table-body').innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 text-xs">Error communicating with network RPC logs.</td></tr>';
             }
         }
 
