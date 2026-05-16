@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     `;
     document.body.insertAdjacentHTML('afterbegin', navHTML);
 
-    // 5. Inject Luxury Floating Mobile Navigation Bar
+    // 5. Inject Luxury Floating Mobile Navigation Bar - FIXED LOGO SIZE
     const mobileNavHTML = `
         <div class="fixed bottom-6 left-3 right-3 md:hidden z-[9999]">
             <div class="bg-[#0f021c]/95 backdrop-blur-3xl border border-white/10 rounded-[2.2rem] flex justify-between items-center px-4 py-3 shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
@@ -95,14 +95,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <span class="text-[8px] font-extrabold uppercase tracking-wider">Matrix</span>
                 </a>
 
-                <!-- Centered Interactive Core Navigation Module -->
-                <div class="relative -top-7 flex flex-col items-center">
-                    <a href="leadership.html" class="relative group">
+                <!-- Centered Interactive Core Navigation Module (Perfect Fixed Dimension Size) -->
+                <div class="relative -top-6 flex flex-col items-center">
+                    <a href="leadership.html" class="relative group block">
                         <div class="absolute inset-0 bg-gradient-to-tr from-pink-500 to-purple-600 blur-xl opacity-60 group-hover:opacity-100 transition-opacity rounded-full"></div>
-                        <div class="relative w-15 h-15 bg-gradient-to-tr from-[#16022b] to-[#32065c] rounded-full flex items-center justify-center border-4 border-[#0d0118] shadow-[0_8px_25px_rgba(235,30,140,0.4)] p-2.5">
+                        <div class="relative w-12 h-12 bg-gradient-to-tr from-[#16022b] to-[#32065c] rounded-full flex items-center justify-center border-4 border-[#0d0118] shadow-[0_6px_20px_rgba(235,30,140,0.4)] p-1.5">
                             ${premiumNexoraLogo}
                         </div>
-                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[7px] font-black px-2.5 py-0.5 rounded-full border border-white/20 whitespace-nowrap uppercase tracking-wider scale-90">
+                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[7px] font-black px-2 py-0.5 rounded-full border border-white/20 whitespace-nowrap uppercase tracking-wider scale-90">
                             Team
                         </div>
                     </a>
