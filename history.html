@@ -91,18 +91,16 @@
         </div>
 
     </div>
- <script src="components.js"></script>
+    <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
         async function loadTransactions() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
-            // Core initialization wait handler
             if (typeof init === 'function' && (!window.signer || !window.contract)) {
                 await init();
             }
 
-            // `signer` ya `contract` ready hone tak wait karne ka safety check
             if (!window.signer || !window.contract) {
                 console.log("Web3 global handlers not ready, retrying in 1s...");
                 setTimeout(loadTransactions, 1000);
@@ -114,7 +112,6 @@
                 const tableBody = document.getElementById('tx-table-body');
                 tableBody.innerHTML = '';
 
-                // ABI hata di hai kyunki ab 'window.contract' direct main handler se ready milega
                 const records = await window.contract.getUserIncomeHistory(userAddress);
 
                 if (records.length === 0) {
@@ -124,7 +121,6 @@
 
                 let indexCounter = 1;
 
-                // Loop reverse chalega taaki latest income top par dikhe (Newest First)
                 for (let i = records.length - 1; i >= 0; i--) {
                     const rec = records[i];
                     const txDate = new Date(rec.timestamp.toNumber() * 1000);
@@ -136,6 +132,17 @@
                     let badgeClass = "badge-income";
                     if (rec.incomeType === "Level Upgrade") badgeClass = "badge-upgrade";
                     if (rec.incomeType === "Spillover") badgeClass = "badge-spill";
+
+                    // SAFETY CHECK: Agar test data ki wajah se kahin '0' store ho gaya ho, toh runtime fallback convert karega
+                    let activeId = rec.fromUserId.toString();
+                    if (activeId === "0" && rec.fromUser !== "0x0000000000000000000000000000000000000000") {
+                        try {
+                            const fallbackId = await window.contract.addressToId(rec.fromUser);
+                            if(fallbackId.toNumber() > 0) {
+                                activeId = fallbackId.toString();
+                            }
+                        } catch(e) { console.log("ID fallback error"); }
+                    }
 
                     const row = document.createElement('tr');
                     row.className = 'table-row border-b border-white/5 text-xs transition';
@@ -154,7 +161,7 @@
                         </td>
                         <td class="p-5">
                             <div class="flex flex-col">
-                                <span class="text-white font-black">ID: ${rec.fromUserId.toString()}</span>
+                                <span class="text-white font-black">ID: ${activeId}</span>
                                 <span class="font-mono text-[10px] text-gray-500 mt-0.5">${rec.fromUser.substring(0,6)}...${rec.fromUser.substring(38)}</span>
                             </div>
                         </td>
