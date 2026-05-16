@@ -3,210 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RebirthKey | Matrix DeFi Evolution</title>
+    <title>B-Nexora | Next-Gen Matrix DeFi Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        :root {
+            --primary: #9d34da;
+            --secondary: #eb1e8c;
+            --dark-bg: #0d0118;
+            --card-bg: rgba(25, 10, 45, 0.6);
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(157, 52, 218, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(235, 30, 140, 0.15) 0%, transparent 50%),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
+        .glass {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #eb1e8c 0%, #9d34da 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-glow {
+            background: linear-gradient(135deg, #eb1e8c 0%, #9d34da 100%);
+            box-shadow: 0 4px 20px rgba(235, 30, 140, 0.3);
+            transition: all 0.3s ease;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(235, 30, 140, 0.6);
+        }
+        .premium-border {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .premium-border:hover {
+            border-color: rgba(235, 30, 140, 0.4);
+            box-shadow: 0 10px 30px rgba(25, 10, 45, 0.8);
+            transform: translateY(-4px);
+        }
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: rgba(157, 52, 218, 0.1);
+            border: 1px solid rgba(157, 52, 218, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #eb1e8c;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+    </style>
 </head>
 <body>
 
     <canvas id="bg-canvas"></canvas>
 
-    <div id="header-placeholder"></div>
+    <!-- Global Dynamic Navbar Destination Hook -->
+    <div id="header-placeholder" class="relative z-50"></div>
 
-    <header class="max-w-7xl mx-auto px-6 pt-20 pb-20 text-center relative z-10">
-        <div class="inline-block px-4 py-1.5 glass text-[10px] font-bold tracking-[0.2em] text-yellow-500 border-yellow-500/20 mb-8 uppercase">
-            ⚡ Secure USDT Ecosystem • Start with $5 ⚡
+    <!-- Hero Header Unit -->
+    <header class="max-w-7xl mx-auto px-6 pt-16 pb-20 text-center relative z-10">
+        <div class="inline-block px-4 py-1.5 glass text-[10px] font-bold tracking-[0.2em] text-pink-500 border-pink-500/20 mb-8 uppercase">
+            ⚡ Secure USDT Protocol • Decentralized Ecosystem ⚡
         </div>
-        <h1 class="hero-title text-6xl md:text-8xl font-black orbitron leading-none mb-6">
-            REBIRTH <span class="text-gradient italic">KEY</span> <br> MATRIX SYSTEM
+        <h1 class="text-5xl md:text-8xl font-black tracking-tighter mb-6 leading-none uppercase">
+            B-<span class="text-gradient italic">NEXORA</span> <br> DEFI MATRIX
         </h1>
-        <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Experience the next generation of Decentralized Matrix and Single Leg income. 12 powerful packages designed for sustainable wealth.
+        <p class="text-gray-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            Experience the evolution of smart staking and high-yielding matrix structures. Built with audited smart contract infrastructure for unlimited passive loops.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-            <button id="login-btn-main" onclick="handleLogin()" class="btn-glow px-10 py-4 rounded-2xl font-black text-lg">GET STARTED NOW</button>
+            <button onclick="location.href='index1.html'" class="btn-glow px-10 py-4 rounded-2xl font-black text-xs md:text-sm tracking-widest uppercase">LAUNCH DASHBOARD</button>
         </div>
     </header>
 
-    <section class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+    <!-- ROI Tiers & Packages Section -->
+    <section class="max-w-7xl mx-auto px-6 py-16 relative z-10">
         <div class="text-center mb-16">
-            <h2 class="text-3xl font-black orbitron italic">ENTRY <span class="text-gradient uppercase">PACKAGES</span></h2>
-            <p class="text-gray-500 text-xs mt-2 tracking-widest uppercase">Start your journey with these starter tiers</p>
+            <h2 class="text-3xl font-black tracking-tight uppercase">STAKING <span class="text-gradient">TIERS</span></h2>
+            <p class="text-gray-500 text-xs mt-2 tracking-widest uppercase">High performance ROI distribution ranges</p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto justify-items-center">
-            <div class="glass p-8 text-center border-l-4 border-l-yellow-500 w-full hover:scale-105 transition-transform">
-                <span class="text-[10px] font-bold text-gray-500 uppercase">Starter Tier</span>
-                <h3 class="text-xl font-black my-2 orbitron">PKG 1</h3>
-                <div class="text-4xl font-black text-gradient my-4">$5</div>
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Matrix + Direct Income</p>
+            <!-- Tier 1 -->
+            <div class="glass p-8 text-center border-l-4 border-l-purple-600 w-full hover:scale-105 transition-transform">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Starter Loop</span>
+                <h3 class="text-xl font-black my-2 tracking-tight">TIER V1</h3>
+                <div class="text-4xl font-black text-gradient my-4">5.5% <span class="text-xs text-gray-400">Daily</span></div>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Automated Matrix Queue</p>
             </div>
 
-            <div class="glass p-8 text-center border-l-4 border-l-yellow-600 w-full hover:scale-105 transition-transform">
-                <span class="text-[10px] font-bold text-gray-500 uppercase">Bronze Tier</span>
-                <h3 class="text-xl font-black my-2 orbitron">PKG 2</h3>
-                <div class="text-4xl font-black text-gradient my-4">$44</div>
-                <p class="text-[10px] text-gray-500 font-bold uppercase">Level + Global Rewards</p>
+            <!-- Tier 2 -->
+            <div class="glass p-8 text-center border-l-4 border-l-pink-500 w-full hover:scale-105 transition-transform">
+                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Advance Node</span>
+                <h3 class="text-xl font-black my-2 tracking-tight">TIER V4</h3>
+                <div class="text-4xl font-black text-gradient my-4">6.2% <span class="text-xs text-gray-400">Daily</span></div>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Level Matching Spillovers</p>
             </div>
 
-            <div class="glass p-8 text-center border-2 border-yellow-500 relative md:scale-110 shadow-2xl shadow-yellow-500/10 w-full">
-                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[10px] font-black px-4 py-1 rounded-full uppercase whitespace-nowrap">Elite Choice</div>
-                <span class="text-[10px] font-bold text-yellow-500 uppercase">Silver Tier</span>
-                <h3 class="text-xl font-black my-2 orbitron">PKG 3</h3>
-                <div class="text-4xl font-black text-gradient my-4">$65</div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase">Advanced Single Leg Depth</p>
+            <!-- Tier 3 Highlighted -->
+            <div class="glass p-8 text-center border-2 border-pink-500 relative md:scale-110 shadow-2xl shadow-pink-500/10 w-full">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-[9px] font-black px-4 py-1 rounded-full uppercase whitespace-nowrap tracking-wider">Max Yield</div>
+                <span class="text-[10px] font-bold text-pink-400 uppercase tracking-wider">Apex Matrix</span>
+                <h3 class="text-xl font-black my-2 tracking-tight">TIER V7</h3>
+                <div class="text-4xl font-black text-gradient my-4">7.0% <span class="text-xs text-gray-400">Daily</span></div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Global Rebirth Access</p>
             </div>
         </div>
+        
         <div class="text-center mt-12">
-            <p class="text-gray-500 text-sm">...and 9 more powerful packages up to $20,514</p>
+            <p class="text-gray-500 text-xs uppercase tracking-widest">System architecture scales smoothly up to 12 distinct functional slots</p>
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-6 py-20 relative z-10 border-t border-white/5">
+    <!-- Project Blueprint Details Section -->
+    <section class="max-w-7xl mx-auto px-6 py-16 relative z-10 border-t border-white/5">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-                <h2 class="text-4xl font-black orbitron italic mb-6 uppercase">Project <span class="text-gradient">Details</span></h2>
-                <p class="text-gray-400 leading-relaxed mb-6">
-                    Rebirthkey is a community-driven digital platform designed to create financial growth opportunities through a structured distribution system.
+                <h2 class="text-3xl font-black tracking-tight uppercase mb-6">PROTOCOL <span class="text-gradient">OVERVIEW</span></h2>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    B-Nexora implements a decentralized framework using hyper-optimized smart contracts. It guarantees automated value distribution directly to individual user nodes without centralized interaction.
                 </p>
                 <div class="space-y-4">
-                    <div class="flex items-start gap-4 glass p-4 border-l-2 border-yellow-500">
-                        <div class="text-yellow-500 mt-1"><i data-lucide="network" class="w-5 h-5"></i></div>
+                    <div class="flex items-start gap-4 glass p-4 border-l-2 border-purple-500">
+                        <div class="icon-circle mt-0.5 shrink-0"><i data-lucide="layers" class="w-4 h-4"></i></div>
                         <div>
-                            <h5 class="font-bold text-sm uppercase orbitron">Platform Overview</h5>
-                            <p class="text-gray-500 text-xs mt-1">Operates on the Binance blockchain, utilizing smart contract technology to ensure transparency and security.</p>
+                            <h5 class="font-bold text-sm uppercase">100% On-Chain Tokenomics</h5>
+                            <p class="text-gray-500 text-xs mt-1">Every transactional stream executes autonomously on public blockchain ledger networks to ensure liquidity shield preservation.</p>
                         </div>
                     </div>
-                    <div class="flex items-start gap-4 glass p-4 border-l-2 border-yellow-500">
-                        <div class="text-yellow-500 mt-1"><i data-lucide="compass" class="w-5 h-5"></i></div>
+                    <div class="flex items-start gap-4 glass p-4 border-l-2 border-pink-500">
+                        <div class="icon-circle mt-0.5 shrink-0"><i data-lucide="refresh-cw" class="w-4 h-4"></i></div>
                         <div>
-                            <h5 class="font-bold text-sm uppercase orbitron">Our Vision</h5>
-                            <p class="text-gray-500 text-xs mt-1">To build a global community that empowers individuals to achieve financial growth through a decentralized system.</p>
+                            <h5 class="font-bold text-sm uppercase">Global Rebirth Queues</h5>
+                            <p class="text-gray-500 text-xs mt-1">Smart matrix recycling architecture continuously places completed modules back into the downstream pool for perpetual loops.</p>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="glass p-6 text-center">
-                    <div class="text-yellow-500 flex justify-center mb-3"><i data-lucide="check-circle" class="w-8 h-8"></i></div>
-                    <h6 class="font-bold text-xs uppercase mb-2">100% Distribution</h6>
-                    <p class="text-[10px] text-gray-500">Funds distributed within the community. No central authority.</p>
+                <div class="glass p-6 text-center premium-border">
+                    <div class="text-pink-500 flex justify-center mb-3"><i data-lucide="shield-check" class="w-7 h-7"></i></div>
+                    <h6 class="font-bold text-xs uppercase mb-1">Immutable Security</h6>
+                    <p class="text-[10px] text-gray-500">Tamper-proof smart contract rules shield users against any system state edits.</p>
                 </div>
-                <div class="glass p-6 text-center">
-                    <div class="text-yellow-500 flex justify-center mb-3"><i data-lucide="cpu" class="w-8 h-8"></i></div>
-                    <h6 class="font-bold text-xs uppercase mb-2">Smart Contracts</h6>
-                    <p class="text-[10px] text-gray-500">Automated processes eliminate human interference.</p>
+                <div class="glass p-6 text-center premium-border">
+                    <div class="text-purple-500 flex justify-center mb-3"><i data-lucide="zap" class="w-7 h-7"></i></div>
+                    <h6 class="font-bold text-xs uppercase mb-1">Instant Payout Routing</h6>
+                    <p class="text-[10px] text-gray-500">Earnings bypass temporary operational vaults, landing directly inside member wallets.</p>
                 </div>
-                <div class="glass p-6 text-center">
-                    <div class="text-yellow-500 flex justify-center mb-3"><i data-lucide="eye" class="w-8 h-8"></i></div>
-                    <h6 class="font-bold text-xs uppercase mb-2">Transparency</h6>
-                    <p class="text-[10px] text-gray-500">Every transaction recorded and verified on-chain.</p>
+                <div class="glass p-6 text-center premium-border">
+                    <div class="text-pink-500 flex justify-center mb-3"><i data-lucide="eye" class="w-7 h-7"></i></div>
+                    <h6 class="font-bold text-xs uppercase mb-1">Public Transparency</h6>
+                    <p class="text-[10px] text-gray-500">Verify matrix structures and deposit distributions on-chain instantly via block explorers.</p>
                 </div>
-                <div class="glass p-6 text-center">
-                    <div class="text-yellow-500 flex justify-center mb-3"><i data-lucide="lock" class="w-8 h-8"></i></div>
-                    <h6 class="font-bold text-xs uppercase mb-2">Decentralized</h6>
-                    <p class="text-[10px] text-gray-500">Immutable and tamper-proof records for maximum security.</p>
+                <div class="glass p-6 text-center premium-border">
+                    <div class="text-purple-500 flex justify-center mb-3"><i data-lucide="cpu" class="w-7 h-7"></i></div>
+                    <h6 class="font-bold text-xs uppercase mb-1">Autonomous Logic</h6>
+                    <p class="text-[10px] text-gray-500">Zero administrative keys. Completely self-governed matrix computation engine.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-6 py-24 relative z-10 border-t border-white/5">
+    <!-- Workflow Execution Pipeline -->
+    <section class="max-w-7xl mx-auto px-6 py-20 relative z-10 border-t border-white/5">
         <div class="text-center mb-16">
-            <h2 class="text-4xl font-black orbitron italic">THE <span class="text-gradient uppercase">REBIRTH</span> PROCESS</h2>
-            <p class="text-gray-500 text-sm tracking-widest uppercase mt-2">6 Streams of Decentralized Income</p>
+            <h2 class="text-3xl font-black tracking-tight uppercase">THE NEXORA <span class="text-gradient">PROCESS</span></h2>
+            <p class="text-gray-500 text-xs tracking-widest uppercase mt-2">6 Streams of Automated Decentralized Wealth</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="key"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">01. Activate Key</h4>
-                    <p class="text-gray-400 text-sm">Register with your referrer and activate the $5 starter package.</p>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="wallet"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">01. Connect Node</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Securely link your decentralized wallet session to initialize your protocol dashboard.</p>
             </div>
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="layers"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">02. Auto Matrix</h4>
-                    <p class="text-gray-400 text-sm">Enter the Mega Pool and benefit from automated 3-slot recycling.</p>
-                </div>
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="grid"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">02. Unlock Slots</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Activate up to 12 layered matrix package tiers sequentially to expand your computational capacity.</p>
             </div>
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="users"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">03. Build Team</h4>
-                    <p class="text-gray-400 text-sm">Earn 12 levels of matching income and direct referral bonuses.</p>
-                </div>
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="users" class="w-4 h-4"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">03. Network Spillover</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Benefit directly from global cluster placements and upline/downline compression matrix algorithms.</p>
             </div>
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="arrow-down-right"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">04. Single Leg</h4>
-                    <p class="text-gray-400 text-sm">Profit from global downline movement based on your package depth.</p>
-                </div>
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="trending-up"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">04. Staking Returns</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Harvest automated dynamic ROI payouts scaling safely up to 7% every 24-hour cycle.</p>
             </div>
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="globe"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">05. Global Funds</h4>
-                    <p class="text-gray-400 text-sm">Qualify for Lunar and Boxer funds for consistent daily rewards.</p>
-                </div>
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="network"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">05. Level Match</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Collect matching generational incentives branching down through deep structured peer levels.</p>
             </div>
-            <div class="glass p-8 premium-border">
-                <div class="relative z-10">
-                    <div class="icon-circle mb-6"><i data-lucide="refresh-cw"></i></div>
-                    <h4 class="text-xl font-black mb-3 italic">06. Rebirth Cycle</h4>
-                    <p class="text-gray-400 text-sm">Automatic re-entry into pools ensures perpetual income flow.</p>
-                </div>
+            <div class="glass p-6 premium-border">
+                <div class="icon-circle mb-4"><i data-lucide="rotate-cw"></i></div>
+                <h4 class="text-lg font-black mb-2 italic">06. Rebirth Trigger</h4>
+                <p class="text-gray-400 text-xs leading-relaxed">Automatic recycled entries place slots back in line, eliminating terminal dead ends.</p>
             </div>
         </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-6 py-20 bg-gradient-to-t from-yellow-900/10 to-transparent relative z-10">
-        <h2 class="text-4xl font-black orbitron italic text-center mb-16 uppercase">Platform <span class="text-gradient">Core</span></h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="glass p-10 premium-border flex gap-6">
-                <div class="relative z-10 flex gap-6">
-                    <div class="text-yellow-500"><i data-lucide="shield-check" class="w-10 h-10"></i></div>
-                    <div>
-                        <h5 class="text-lg font-bold mb-2 uppercase">Verified Contract</h5>
-                        <p class="text-gray-500 text-sm">100% transparent Solidity code running on the BSC blockchain.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="glass p-10 premium-border flex gap-6">
-                <div class="relative z-10 flex gap-6">
-                    <div class="text-yellow-500"><i data-lucide="zap" class="w-10 h-10"></i></div>
-                    <div>
-                        <h5 class="text-lg font-bold mb-2 uppercase">Instant Payouts</h5>
-                        <p class="text-gray-500 text-sm">Direct wallet-to-wallet transfers. No manual approvals needed.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="glass p-10 premium-border flex gap-6">
-                <div class="relative z-10 flex gap-6">
-                    <div class="text-yellow-500"><i data-lucide="trending-up" class="w-10 h-10"></i></div>
-                    <div>
-                        <h5 class="text-lg font-bold mb-2 uppercase">Income Capping</h5>
-                        <p class="text-gray-500 text-sm">Balanced ecosystem with capping limits for long-term stability.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Global Pre-Rendered Footer Destination Hook -->
+    <div id="footer-placeholder" class="relative z-10"></div>
 
-    <div id="footer-placeholder"></div>
-
-    <script src="web3-handler.js"></script>
-    <script src="scripts.js"></script>
     <script>
-        lucide.createIcons();
+        // Micro Background Interactive Canvas Particle Simulation Engine
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * -0.4 - 0.1;
+            }
+            update() {
+                this.y += this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(235, 30, 140, 0.3)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
     </script>
 </body>
 </html>
