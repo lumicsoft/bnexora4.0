@@ -277,7 +277,7 @@
                 const matrixInfo = await window.contract.usersXMatrix(address, level);
                 document.getElementById('recycle-count').innerText = matrixInfo.reinvestCount.toString();
                 document.getElementById('held-tokens').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.heldTokenForUpgrade, 18)).toFixed(2) + " USDT";
-                document.getElementById('matrix-earnings').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.totalEarning, 18)).toFixed(2) + " USDT";
+              
 
                 const referrals = await window.contract.usersXMatrixReferrals(address, level);
                 renderTree(referrals);
