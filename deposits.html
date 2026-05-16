@@ -28,7 +28,6 @@
             border-radius: 24px;
         }
         
-        /* Premium Scrollbar Fix for Package and Matrix Wrapper */
         .custom-scrollbar::-webkit-scrollbar {
             height: 5px;
         }
@@ -37,14 +36,13 @@
             border-radius: 10px;
         }
         
-        /* Tree Visuals Optimization for Mobile Viewports */
         .tree-container { 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             gap: 1.5rem; 
             padding: 20px; 
-            min-w: 640px; /* Forces stable alignment inside wrapper on tiny layout */
+            min-w: 640px; 
         }
         .node {
             width: 46px; 
@@ -76,7 +74,6 @@
             background: linear-gradient(to bottom, rgba(157, 52, 218, 0.6), rgba(235, 30, 140, 0.2)); 
         }
         
-        /* Slots Styles Configuration */
         .pkg-btn { 
             padding: 12px 24px; 
             border-radius: 16px; 
@@ -102,10 +99,6 @@
             background: rgba(0,0,0,0.4);
             border-color: transparent;
         }
-        .pkg-btn.locked:hover {
-            transform: none !important;
-            box-shadow: none !important;
-        }
     </style>
 </head>
 <body class="p-3 md:p-6">
@@ -122,14 +115,14 @@
             </a>
         </div>
 
-        <!-- Package/Slots Selector Component -->
+        <!-- Slots Selector Component -->
         <div class="glass-card p-4 overflow-x-auto custom-scrollbar">
             <div class="flex gap-3" id="package-list">
-                <!-- Dynamically populated locked/active slots load here -->
+                <!-- Slots will load dynamically here -->
             </div>
         </div>
 
-        <!-- Matrix Info Stats Matrix Grid -->
+        <!-- Matrix Info Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="glass-card p-5 text-center relative overflow-hidden">
                 <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Recycle Count</p>
@@ -147,7 +140,6 @@
 
         <!-- Tree Visualization Canvas -->
         <div class="glass-card min-h-[520px] flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden">
-            <!-- Inner container scroll captures pixel layouts perfectly preventing breakdown -->
             <div class="w-full overflow-x-auto custom-scrollbar py-6">
                 <div id="tree-root" class="tree-container">
                     <!-- Node 0 (Root) -->
@@ -179,7 +171,6 @@
             }
 
             if (!window.signer || !window.contract) {
-                console.log("Web3 engine connection fallback...");
                 setTimeout(initMatrixView, 1000);
                 return;
             }
@@ -187,15 +178,15 @@
             try {
                 const userAddress = await window.signer.getAddress();
                 
-                // Fetch activation state maps for all 1-12 structures
-                for (uint8 i = 1; i <= 12; i++) {
+                // Active status check for all slots 1 to 12
+                for (let i = 1; i <= 12; i++) {
                     const isActive = await window.contract.isUserSlotActiveByAddress(userAddress, i);
                     userSlotsState[i] = isActive;
                 }
 
                 renderPackageButtons();
                 
-                // Default fallback load first active available slot node
+                // Default slot selector
                 let defaultSlot = 1;
                 for(let i = 1; i <= 12; i++) {
                     if(userSlotsState[i]) {
@@ -208,7 +199,6 @@
 
             } catch (err) {
                 console.error("View states parsing crashed:", err);
-                // Secondary execution layer block mapping bypass
                 renderPackageButtons();
                 loadMatrixData(1);
             }
@@ -242,7 +232,6 @@
                 container.appendChild(btn);
             }
             
-            // Set initial active status indicator highlight
             setTimeout(() => {
                 const activeButtons = document.querySelectorAll('.pkg-btn:not(.locked)');
                 if(activeButtons.length > 0) activeButtons[0].classList.add('active');
@@ -263,14 +252,14 @@
                 renderTree(referrals);
 
             } catch (err) {
-                console.error("Matrix elements data stream map break:", err);
+                console.error("Matrix loading error:", err);
             }
         }
 
         function renderTree(refs) {
-            renderRow('row-1', 2, refs, 0);  // Binary Branch Gen
-            renderRow('row-2', 4, refs, 2);  // Quad Level Branch Gen
-            renderRow('row-3', 8, refs, 6);  // Octa Base Layer Gen
+            renderRow('row-1', 2, refs, 0);  
+            renderRow('row-2', 4, refs, 2);  
+            renderRow('row-3', 8, refs, 6);  
         }
 
         function renderRow(rowId, count, refs, offset) {
