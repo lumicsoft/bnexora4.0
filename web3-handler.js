@@ -466,6 +466,7 @@ async function fetchAllData(address) {
         updateText('total-income', income);
         updateText('total-income-display', income); // Agar element exists karta hai
         updateText('balance-large', income);
+        updateText('all-income', income);
         
         // Matrix, Level aur Direct Income (Contract abhi total income hi de raha hai)
         updateText('matrix-earnings', income + " USDT"); 
@@ -476,6 +477,7 @@ async function fetchAllData(address) {
         updateText('partners-count', details.partnersCount.toString());
         updateText('direct-count', details.partnersCount.toString());
         updateText('team-size', details.teamSize.toString());
+        updateText('all-team', details.teamSize.toString());
         
         // Active Slots count (Level 1 to 12)
         updateText('active-slots-count', details.activeSlotsCount.toString() + "/12");
