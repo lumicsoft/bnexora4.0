@@ -10,12 +10,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #9d34da; --secondary: #eb1e8c; --dark-bg: #0d0118; }
+        :root { 
+            --primary: #9d34da; 
+            --secondary: #eb1e8c; 
+            --dark-bg: #0d0118; 
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--dark-bg);
             color: white;
-            background-image: radial-gradient(circle at 50% 50%, rgba(157, 52, 218, 0.1) 0%, transparent 80%);
+            background-image: radial-gradient(circle at 50% 50%, rgba(157, 52, 218, 0.15) 0%, transparent 80%);
         }
         .glass-card {
             background: rgba(25, 10, 45, 0.7);
@@ -23,143 +27,272 @@
             backdrop-filter: blur(15px);
             border-radius: 24px;
         }
-        /* Tree Visuals */
-        .tree-container { display: flex; flex-direction: column; align-items: center; gap: 2rem; padding: 20px; overflow-x: auto; }
-        .node {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: #1e0533; border: 2px solid #9d34da;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 10px; position: relative; transition: all 0.3s;
+        
+        /* Premium Scrollbar Fix for Package and Matrix Wrapper */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 5px;
         }
-        .node.active { background: linear-gradient(135deg, #eb1e8c, #9d34da); border-color: #fff; box-shadow: 0 0 15px #eb1e8c; }
-        .level-row { display: flex; justify-content: center; gap: 10px; width: 100%; }
-        .connector { height: 20px; width: 2px; background: rgba(255,255,255,0.2); }
-        .pkg-btn { padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; }
-        .pkg-btn.active { background: #eb1e8c; border-color: #fff; }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(235, 30, 140, 0.3);
+            border-radius: 10px;
+        }
+        
+        /* Tree Visuals Optimization for Mobile Viewports */
+        .tree-container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 1.5rem; 
+            padding: 20px; 
+            min-w: 640px; /* Forces stable alignment inside wrapper on tiny layout */
+        }
+        .node {
+            width: 46px; 
+            height: 46px; 
+            border-radius: 50%;
+            background: #1e0533; 
+            border: 2px solid #9d34da;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            position: relative; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+        }
+        .node.active { 
+            background: linear-gradient(135deg, #eb1e8c, #9d34da); 
+            border-color: #fff; 
+            box-shadow: 0 0 20px #eb1e8c, inset 0 0 5px rgba(255,255,255,0.4); 
+        }
+        .level-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            width: 100%; 
+        }
+        .connector { 
+            height: 24px; 
+            width: 2px; 
+            background: linear-gradient(to bottom, rgba(157, 52, 218, 0.6), rgba(235, 30, 140, 0.2)); 
+        }
+        
+        /* Slots Styles Configuration */
+        .pkg-btn { 
+            padding: 12px 24px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255,255,255,0.03);
+            white-space: nowrap;
+        }
+        .pkg-btn.active { 
+            background: linear-gradient(135deg, #eb1e8c 0%, #9d34da 100%); 
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 0 15px rgba(235, 30, 140, 0.4);
+        }
+        .pkg-btn.locked {
+            opacity: 0.35;
+            filter: grayscale(100%);
+            cursor: not-allowed !important;
+            background: rgba(0,0,0,0.4);
+            border-color: transparent;
+        }
+        .pkg-btn.locked:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
-<body class="p-4">
+<body class="p-3 md:p-6">
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-6xl mx-auto space-y-6">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-black">Matrix <span class="text-pink-500">View</span></h1>
-            <a href="index1.html" class="glass-card px-6 py-2 text-sm flex items-center gap-2">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+            <div>
+                <h1 class="text-2xl font-black italic tracking-wide">MATRIX <span class="text-pink-500">VIEW</span></h1>
+                <p class="text-gray-400 text-[10px] uppercase font-bold tracking-widest mt-0.5">Structural Placement Line</p>
+            </div>
+            <a href="index1.html" class="glass-card px-5 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-white/5 transition w-full sm:w-auto justify-center">
+                <i data-lucide="arrow-left" class="w-4 h-4 text-pink-500"></i> Back to Dashboard
             </a>
         </div>
 
-        <!-- Package Selector -->
-        <div class="glass-card p-4 mb-8 overflow-x-auto">
+        <!-- Package/Slots Selector Component -->
+        <div class="glass-card p-4 overflow-x-auto custom-scrollbar">
             <div class="flex gap-3" id="package-list">
-                <!-- Level 1 to 12 Buttons will load here -->
+                <!-- Dynamically populated locked/active slots load here -->
             </div>
         </div>
 
-        <!-- Matrix Info Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-card p-6 text-center">
-                <p class="text-xs text-gray-400 uppercase">Recycle Count</p>
-                <h3 class="text-2xl font-bold" id="recycle-count">0</h3>
+        <!-- Matrix Info Stats Matrix Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="glass-card p-5 text-center relative overflow-hidden">
+                <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Recycle Count</p>
+                <h3 class="text-2xl font-black tracking-tight" id="recycle-count">0</h3>
             </div>
-            <div class="glass-card p-6 text-center">
-                <p class="text-xs text-gray-400 uppercase">Matrix Earnings</p>
-                <h3 class="text-2xl font-bold text-pink-500" id="matrix-earnings">0.00 USDT</h3>
+            <div class="glass-card p-5 text-center relative overflow-hidden border-b-2 border-pink-500">
+                <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Matrix Earnings</p>
+                <h3 class="text-2xl font-black text-pink-500 tracking-tight" id="matrix-earnings">0.00 USDT</h3>
             </div>
-            <div class="glass-card p-6 text-center">
-                <p class="text-xs text-gray-400 uppercase">Held for Upgrade</p>
-                <h3 class="text-2xl font-bold text-yellow-500" id="held-tokens">0.00</h3>
+            <div class="glass-card p-5 text-center relative overflow-hidden border-b-2 border-yellow-500">
+                <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Held for Upgrade</p>
+                <h3 class="text-2xl font-black text-yellow-500 tracking-tight" id="held-tokens">0.00 USDT</h3>
             </div>
         </div>
 
-        <!-- Tree Visualization Area -->
-        <div class="glass-card min-h-[600px] flex flex-col items-center justify-center p-8">
-            <div id="tree-root" class="tree-container">
-                <!-- Node 0 (Root) -->
-                <div class="node active" id="node-0">YOU</div>
-                <div class="connector"></div>
-                <!-- Level 1 (2 nodes) -->
-                <div class="level-row" id="row-1"></div>
-                <div class="connector"></div>
-                <!-- Level 2 (4 nodes) -->
-                <div class="level-row" id="row-2"></div>
-                <div class="connector"></div>
-                <!-- Level 3 (8 nodes) -->
-                <div class="level-row" id="row-3"></div>
+        <!-- Tree Visualization Canvas -->
+        <div class="glass-card min-h-[520px] flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden">
+            <!-- Inner container scroll captures pixel layouts perfectly preventing breakdown -->
+            <div class="w-full overflow-x-auto custom-scrollbar py-6">
+                <div id="tree-root" class="tree-container">
+                    <!-- Node 0 (Root) -->
+                    <div class="node active font-black text-[10px] tracking-wider" id="node-0">YOU</div>
+                    <div class="connector"></div>
+                    <!-- Level 1 (2 nodes) -->
+                    <div class="level-row" id="row-1"></div>
+                    <div class="connector"></div>
+                    <!-- Level 2 (4 nodes) -->
+                    <div class="level-row" id="row-2"></div>
+                    <div class="connector"></div>
+                    <!-- Level 3 (8 nodes) -->
+                    <div class="level-row" id="row-3"></div>
+                </div>
             </div>
         </div>
     </div>
-<script src="components.js"></script>
+
+    <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
-        let currentLevel = 1;
+        let userSlotsState = {};
 
-        // Initialize Page
         async function initMatrixView() {
-            lucide.createIcons();
-            if (typeof init === 'function') await init();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
             
-            renderPackageButtons();
-            loadMatrixData(1);
+            if (typeof init === 'function' && (!window.signer || !window.contract)) {
+                await init();
+            }
+
+            if (!window.signer || !window.contract) {
+                console.log("Web3 engine connection fallback...");
+                setTimeout(initMatrixView, 1000);
+                return;
+            }
+
+            try {
+                const userAddress = await window.signer.getAddress();
+                
+                // Fetch activation state maps for all 1-12 structures
+                for (uint8 i = 1; i <= 12; i++) {
+                    const isActive = await window.contract.isUserSlotActiveByAddress(userAddress, i);
+                    userSlotsState[i] = isActive;
+                }
+
+                renderPackageButtons();
+                
+                // Default fallback load first active available slot node
+                let defaultSlot = 1;
+                for(let i = 1; i <= 12; i++) {
+                    if(userSlotsState[i]) {
+                        defaultSlot = i;
+                        break;
+                    }
+                }
+                
+                await loadMatrixData(defaultSlot);
+
+            } catch (err) {
+                console.error("View states parsing crashed:", err);
+                // Secondary execution layer block mapping bypass
+                renderPackageButtons();
+                loadMatrixData(1);
+            }
         }
 
         function renderPackageButtons() {
             const container = document.getElementById('package-list');
-            for(let i=1; i<=12; i++) {
+            container.innerHTML = '';
+            
+            for(let i = 1; i <= 12; i++) {
                 const btn = document.createElement('button');
-                btn.className = `pkg-btn ${i===1 ? 'active' : ''}`;
+                const isActivated = userSlotsState[i] !== undefined ? userSlotsState[i] : (i === 1);
+                
                 btn.id = `pkg-${i}`;
-                btn.innerText = `Level ${i}`;
-                btn.onclick = () => {
-                    document.querySelectorAll('.pkg-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    loadMatrixData(i);
-                };
+                if (isActivated) {
+                    btn.className = 'pkg-btn';
+                    btn.innerHTML = `<span class="flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Slot ${i}</span>`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.pkg-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        loadMatrixData(i);
+                    };
+                } else {
+                    btn.className = 'pkg-btn locked';
+                    btn.innerHTML = `<span class="flex items-center gap-1.5 text-gray-500"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Slot ${i}</span>`;
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        return false;
+                    };
+                }
                 container.appendChild(btn);
             }
+            
+            // Set initial active status indicator highlight
+            setTimeout(() => {
+                const activeButtons = document.querySelectorAll('.pkg-btn:not(.locked)');
+                if(activeButtons.length > 0) activeButtons[0].classList.add('active');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 50);
         }
 
         async function loadMatrixData(level) {
             try {
-                const address = await signer.getAddress();
-                // 1. Get Matrix Info (Recycle, Held Tokens, Earnings)
-                const matrixInfo = await contract.usersXMatrix(address, level);
+                const address = await window.signer.getAddress();
+                
+                const matrixInfo = await window.contract.usersXMatrix(address, level);
                 document.getElementById('recycle-count').innerText = matrixInfo.reinvestCount.toString();
-                document.getElementById('held-tokens').innerText = ethers.utils.formatEther(matrixInfo.heldTokenForUpgrade);
-                document.getElementById('matrix-earnings').innerText = ethers.utils.formatEther(matrixInfo.totalEarning) + " USDT";
+                document.getElementById('held-tokens').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.heldTokenForUpgrade, 18)).toFixed(2);
+                document.getElementById('matrix-earnings').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.totalEarning, 18)).toFixed(2) + " USDT";
 
-                // 2. Get Referrals array (Full 14 nodes logic)
-                const referrals = await contract.usersXMatrixReferrals(address, level);
+                const referrals = await window.contract.usersXMatrixReferrals(address, level);
                 renderTree(referrals);
 
             } catch (err) {
-                console.error("Matrix Load Error:", err);
+                console.error("Matrix elements data stream map break:", err);
             }
         }
 
         function renderTree(refs) {
-            // Row 1 (2 nodes)
-            renderRow('row-1', 2, refs, 0);
-            // Row 2 (4 nodes)
-            renderRow('row-2', 4, refs, 2);
-            // Row 3 (8 nodes)
-            renderRow('row-3', 8, refs, 6);
+            renderRow('row-1', 2, refs, 0);  // Binary Branch Gen
+            renderRow('row-2', 4, refs, 2);  // Quad Level Branch Gen
+            renderRow('row-3', 8, refs, 6);  // Octa Base Layer Gen
         }
 
         function renderRow(rowId, count, refs, offset) {
             const row = document.getElementById(rowId);
             row.innerHTML = '';
-            for(let i=0; i<count; i++) {
+            for(let i = 0; i < count; i++) {
                 const nodeIdx = offset + i;
                 const node = document.createElement('div');
                 const isFilled = refs[nodeIdx] && refs[nodeIdx] !== "0x0000000000000000000000000000000000000000";
                 
                 node.className = `node ${isFilled ? 'active' : ''}`;
-                node.title = isFilled ? refs[nodeIdx] : 'Empty Slot';
-                node.innerHTML = isFilled ? `<i data-lucide="user" class="w-4 h-4"></i>` : '';
+                
+                if (isFilled) {
+                    node.setAttribute('title', refs[nodeIdx]);
+                    node.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-white animate-pulse"></i>`;
+                } else {
+                    node.setAttribute('title', 'Available Slot Node');
+                    node.innerHTML = `<span class="text-[9px] text-gray-600 font-bold">${offset + i + 1}</span>`;
+                }
                 row.appendChild(node);
             }
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         window.addEventListener('load', initMatrixView);
