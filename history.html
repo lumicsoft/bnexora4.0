@@ -91,28 +91,31 @@
         </div>
 
     </div>
- <script src="components.js"></script>
+
     <script src="web3-handler.js"></script>
     <script>
-      
         async function loadTransactions() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
-            if (typeof provider === 'undefined' && window.ethereum) {
-                window.provider = new ethers.providers.Web3Provider(window.ethereum);
-                window.signer = window.provider.getSigner();
+            // Core initialization wait handler
+            if (typeof init === 'function' && (!window.signer || !window.contract)) {
+                await init();
+            }
+
+            // `signer` ya `contract` ready hone tak wait karne ka safety check
+            if (!window.signer || !window.contract) {
+                console.log("Web3 global handlers not ready, retrying in 1s...");
+                setTimeout(loadTransactions, 1000);
+                return;
             }
 
             try {
-                const userAddress = await signer.getAddress();
-                // CONTRACT_ADDRESS core handler file se global configuration uthayega
-                const activeContract = new ethers.Contract(CONTRACT_ADDRESS, LOCAL_ABI, signer);
-                
+                const userAddress = await window.signer.getAddress();
                 const tableBody = document.getElementById('tx-table-body');
                 tableBody.innerHTML = '';
 
-                // Naya view function direct read calls execute karega
-                const records = await activeContract.getUserIncomeHistory(userAddress);
+                // ABI hata di hai kyunki ab 'window.contract' direct main handler se ready milega
+                const records = await window.contract.getUserIncomeHistory(userAddress);
 
                 if (records.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-500 text-xs">No transactions found in your income history.</td></tr>';
