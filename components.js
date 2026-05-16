@@ -49,10 +49,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             
             <div class="hidden md:flex bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-1 shadow-2xl">
                 <button class="nav-btn-new" onclick="location.href='index1.html'">Dashboard</button>
-                <button class="nav-btn-new" onclick="location.href='matrix.html'">Matrix View</button>
-                <button class="nav-btn-new" onclick="location.href='referrals.html'">Directs</button>
-                <button class="nav-btn-new" onclick="location.href='team-explorer.html'">Network</button>
-                <button class="nav-btn-new" onclick="location.href='transactions.html'">Ledger History</button>
+                <button class="nav-btn-new" onclick="location.href='deposits.html'">Matrix View</button>
+                <button class="nav-btn-new" onclick="location.href='referral.html'">Directs</button>
+                <button class="nav-btn-new" onclick="location.href='leadership.html'">Network</button>
+                <button class="nav-btn-new" onclick="location.href='history.html'">Ledger History</button>
             </div>
             
             <div class="relative flex flex-col items-center">
@@ -90,14 +90,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     <span class="text-[8px] font-extrabold uppercase tracking-wider">Home</span>
                 </a>
                 
-                <a href="matrix.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('matrix.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
+                <a href="deposits.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('deposits.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
                     <i data-lucide="network" class="w-5 h-5"></i>
                     <span class="text-[8px] font-extrabold uppercase tracking-wider">Matrix</span>
                 </a>
 
                 <!-- Centered Interactive Core Navigation Module -->
                 <div class="relative -top-7 flex flex-col items-center">
-                    <a href="team-explorer.html" class="relative group">
+                    <a href="leadership.html" class="relative group">
                         <div class="absolute inset-0 bg-gradient-to-tr from-pink-500 to-purple-600 blur-xl opacity-60 group-hover:opacity-100 transition-opacity rounded-full"></div>
                         <div class="relative w-15 h-15 bg-gradient-to-tr from-[#16022b] to-[#32065c] rounded-full flex items-center justify-center border-4 border-[#0d0118] shadow-[0_8px_25px_rgba(235,30,140,0.4)] p-2.5">
                             ${premiumNexoraLogo}
@@ -108,12 +108,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     </a>
                 </div>
 
-                <a href="referrals.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('referrals.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
+                <a href="referral.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('referral.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
                     <i data-lucide="users" class="w-5 h-5"></i>
                     <span class="text-[8px] font-extrabold uppercase tracking-wider">Directs</span>
                 </a>
                 
-                <a href="transactions.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('transactions.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
+                <a href="history.html" class="flex flex-col items-center gap-1 transition-all duration-300 w-12 ${window.location.pathname.includes('history.html') ? 'text-pink-500 drop-shadow-[0_0_8px_#eb1e8c]' : 'text-gray-500'}">
                     <i data-lucide="history" class="w-5 h-5"></i>
                     <span class="text-[8px] font-extrabold uppercase tracking-wider">Ledger</span>
                 </a>
