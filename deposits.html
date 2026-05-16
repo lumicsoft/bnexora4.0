@@ -115,10 +115,22 @@
             </a>
         </div>
 
-        <!-- Slots Selector Component -->
+        <!-- FIX 1: Static Placeholder Buttons pehle se hi HTML mein rahenge taaki empty area na dikhe -->
         <div class="glass-card p-4 overflow-x-auto custom-scrollbar">
             <div class="flex gap-3" id="package-list">
-                <!-- Slots will load dynamically here -->
+                <!-- JavaScript inko refresh karke live status ke sath override karega -->
+                <button class="pkg-btn locked">Slot 1</button>
+                <button class="pkg-btn locked">Slot 2</button>
+                <button class="pkg-btn locked">Slot 3</button>
+                <button class="pkg-btn locked">Slot 4</button>
+                <button class="pkg-btn locked">Slot 5</button>
+                <button class="pkg-btn locked">Slot 6</button>
+                <button class="pkg-btn locked">Slot 7</button>
+                <button class="pkg-btn locked">Slot 8</button>
+                <button class="pkg-btn locked">Slot 9</button>
+                <button class="pkg-btn locked">Slot 10</button>
+                <button class="pkg-btn locked">Slot 11</button>
+                <button class="pkg-btn locked">Slot 12</button>
             </div>
         </div>
 
@@ -126,7 +138,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="glass-card p-5 text-center relative overflow-hidden">
                 <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Recycle Count</p>
-                <h3 class="text-2xl font-black tracking-tight" id="recycle-count">0</h3>
+                <h3 class="text-2xl font-black tracking-tight" id="recycle-count">--</h3>
             </div>
             <div class="glass-card p-5 text-center relative overflow-hidden border-b-2 border-pink-500">
                 <p class="text-[10px] text-gray-400 uppercase font-extrabold tracking-wider mb-1">Matrix Earnings</p>
@@ -138,21 +150,41 @@
             </div>
         </div>
 
-        <!-- Tree Visualization Canvas -->
+        <!-- FIX 2: Static Layout structure grid predefined hai, load hone par gayab nahi hoga -->
         <div class="glass-card min-h-[520px] flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden">
             <div class="w-full overflow-x-auto custom-scrollbar py-6">
                 <div id="tree-root" class="tree-container">
                     <!-- Node 0 (Root) -->
                     <div class="node active font-black text-[10px] tracking-wider" id="node-0">YOU</div>
                     <div class="connector"></div>
+                    
                     <!-- Level 1 (2 nodes) -->
-                    <div class="level-row" id="row-1"></div>
+                    <div class="level-row" id="row-1">
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">1</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">2</span></div>
+                    </div>
                     <div class="connector"></div>
+                    
                     <!-- Level 2 (4 nodes) -->
-                    <div class="level-row" id="row-2"></div>
+                    <div class="level-row" id="row-2">
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">3</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">4</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">5</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">6</span></div>
+                    </div>
                     <div class="connector"></div>
+                    
                     <!-- Level 3 (8 nodes) -->
-                    <div class="level-row" id="row-3"></div>
+                    <div class="level-row" id="row-3">
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">7</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">8</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">9</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">10</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">11</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">12</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">13</span></div>
+                        <div class="node"><span class="text-[9px] text-gray-600 font-bold">14</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -162,6 +194,7 @@
     <script src="web3-handler.js"></script>
     <script>
         let userSlotsState = {};
+        let selectedSlot = 1;
 
         async function initMatrixView() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -171,6 +204,7 @@
             }
 
             if (!window.signer || !window.contract) {
+                console.log("Waiting for contract architecture...");
                 setTimeout(initMatrixView, 1000);
                 return;
             }
@@ -178,7 +212,7 @@
             try {
                 const userAddress = await window.signer.getAddress();
                 
-                // Active status check for all slots 1 to 12
+                // Pure 12 slots ka status chain state check
                 for (let i = 1; i <= 12; i++) {
                     const isActive = await window.contract.isUserSlotActiveByAddress(userAddress, i);
                     userSlotsState[i] = isActive;
@@ -186,19 +220,22 @@
 
                 renderPackageButtons();
                 
-                // Default slot selector
-                let defaultSlot = 1;
+                // Find default selection slot node
                 for(let i = 1; i <= 12; i++) {
                     if(userSlotsState[i]) {
-                        defaultSlot = i;
+                        selectedSlot = i;
                         break;
                     }
                 }
                 
-                await loadMatrixData(defaultSlot);
+                // Highlight active button array
+                const activeBtn = document.getElementById(`pkg-${selectedSlot}`);
+                if(activeBtn) activeBtn.classList.add('active');
+
+                await loadMatrixData(selectedSlot);
 
             } catch (err) {
-                console.error("View states parsing crashed:", err);
+                console.error("Matrix view parsing fault tracker:", err);
                 renderPackageButtons();
                 loadMatrixData(1);
             }
@@ -214,11 +251,12 @@
                 
                 btn.id = `pkg-${i}`;
                 if (isActivated) {
-                    btn.className = 'pkg-btn';
+                    btn.className = `pkg-btn ${i === selectedSlot ? 'active' : ''}`;
                     btn.innerHTML = `<span class="flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Slot ${i}</span>`;
                     btn.onclick = () => {
                         document.querySelectorAll('.pkg-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
+                        selectedSlot = i;
                         loadMatrixData(i);
                     };
                 } else {
@@ -231,12 +269,7 @@
                 }
                 container.appendChild(btn);
             }
-            
-            setTimeout(() => {
-                const activeButtons = document.querySelectorAll('.pkg-btn:not(.locked)');
-                if(activeButtons.length > 0) activeButtons[0].classList.add('active');
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            }, 50);
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         async function loadMatrixData(level) {
@@ -245,14 +278,14 @@
                 
                 const matrixInfo = await window.contract.usersXMatrix(address, level);
                 document.getElementById('recycle-count').innerText = matrixInfo.reinvestCount.toString();
-                document.getElementById('held-tokens').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.heldTokenForUpgrade, 18)).toFixed(2);
+                document.getElementById('held-tokens').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.heldTokenForUpgrade, 18)).toFixed(2) + " USDT";
                 document.getElementById('matrix-earnings').innerText = parseFloat(ethers.utils.formatUnits(matrixInfo.totalEarning, 18)).toFixed(2) + " USDT";
 
                 const referrals = await window.contract.usersXMatrixReferrals(address, level);
                 renderTree(referrals);
 
             } catch (err) {
-                console.error("Matrix loading error:", err);
+                console.error("Matrix node matrix load mapping break:", err);
             }
         }
 
