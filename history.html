@@ -3,183 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Report | RebirthKey</title>
+    <title>Transaction History | Bnexora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #ffd700; --bg-dark: #060a08; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-dark); color: white; 
-            background-image: radial-gradient(circle at 50% 0%, #1a2e23, #060a08 80%);
-            min-height: 100vh;
+        :root {
+            --primary: #9d34da;
+            --secondary: #eb1e8c;
+            --dark-bg: #0d0118;
+            --card-bg: rgba(25, 10, 45, 0.7);
         }
-        .orbitron { font-family: 'Orbitron', sans-serif; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(157, 52, 218, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(235, 30, 140, 0.1) 0%, transparent 40%),
+                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+        }
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 215, 0, 0.1);
-            backdrop-filter: blur(10px);
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
             border-radius: 24px;
         }
-        .income-row:hover { background: rgba(255, 215, 0, 0.05); }
-        .type-badge {
-            padding: 4px 12px;
-            border-radius: 99px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            display: inline-block;
+        .table-row:hover { background: rgba(255, 255, 255, 0.03); }
+        .badge-income {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .badge-upgrade {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .badge-spill {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
         }
     </style>
 </head>
-<body class="pb-24">
+<body class="p-4 md:p-8">
 
-    <div id="header-placeholder"></div>
-
-    <main class="max-w-6xl mx-auto px-4 pt-10">
-        <div class="mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
             <div>
-                <h3 class="orbitron font-black text-2xl text-white border-l-4 border-yellow-500 pl-4 uppercase">
-                    Income <span class="text-yellow-500">Report</span>
-                </h3>
-                <p class="text-[10px] text-gray-500 font-bold ml-5 mt-1 tracking-widest uppercase">Detailed Earning Logs</p>
+                <h1 class="text-2xl font-black italic">TRANSACTION <span class="text-pink-500">HISTORY</span></h1>
+                <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider font-bold">Real-time Blockchain Ledger</p>
             </div>
-            
-            <div id="total-earned-box" class="glass-card px-6 py-3 flex items-center gap-4">
-                <div class="bg-yellow-500/20 p-2 rounded-lg">
-                    <i data-lucide="wallet" class="text-yellow-500 w-5 h-5"></i>
-                </div>
-                <div>
-                    <p class="text-[9px] text-gray-500 uppercase font-black">Total Earnings</p>
-                    <p id="total-val" class="text-xl font-black orbitron text-yellow-500">$0.00</p>
-                </div>
-            </div>
+            <a href="index1.html" class="glass-card px-6 py-2.5 text-xs font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-white/5 transition">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-            <div class="lg:col-span-4 glass-card p-2 overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="text-[10px] text-gray-500 uppercase font-black border-b border-white/5">
-                        <tr>
-                            <th class="px-6 py-4">S.No</th>
-                            <th class="px-6 py-4">Income Type</th>
-                            <th class="px-6 py-4">From User</th>
-                            <th class="px-6 py-4">Package</th>
-                            <th class="px-6 py-4">Amount</th>
-                            <th class="px-6 py-4">Date & Time</th>
-                            <th class="px-6 py-4 text-right">Status</th>
+        <!-- Transactions Table Card -->
+        <div class="glass-card overflow-hidden">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <h3 class="font-bold flex items-center gap-2">
+                    <i data-lucide="history" class="text-pink-500 w-5 h-5"></i>
+                    All Income & System Logs
+                </h3>
+                <button onclick="loadTransactions()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition flex items-center gap-1">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Refresh Logs
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-[10px] text-gray-400 uppercase tracking-widest border-b border-white/5 bg-black/20">
+                            <th class="p-5">#</th>
+                            <th class="p-5">Level</th>
+                            <th class="p-5">Date & Time</th>
+                            <th class="p-5">Tx Hash</th>
+                            <th class="p-5">User Address</th>
+                            <th class="p-5 text-right">Income Type / Value</th>
                         </tr>
                     </thead>
-                    <tbody id="income-table-body" class="text-sm"></tbody>
+                    <tbody id="tx-table-body">
+                        <!-- Loading State -->
+                        <tr>
+                            <td colspan="6" class="p-20 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-4">
+                                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                                    <p class="text-xs font-bold uppercase tracking-widest">Reading Blockchain Events...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
-                <div id="no-data" class="hidden text-center py-20">
-                    <i data-lucide="database" class="w-12 h-12 text-gray-700 mx-auto mb-4"></i>
-                    <p class="text-gray-500 orbitron text-xs">No Income Records Found</p>
-                </div>
             </div>
         </div>
-    </main>
 
-    <script src="components.js"></script>
+    </div>
+
     <script src="web3-handler.js"></script>
- <script>
-const INCOME_TYPES = {
-    1: { label: "Direct Referral", color: "bg-blue-500/20 text-blue-400" },
-    2: { label: "Level Matching", color: "bg-purple-500/20 text-purple-400" },
-    3: { label: "Single Leg", color: "bg-green-500/20 text-green-400" },
-    4: { label: "Matrix Income", color: "bg-yellow-500/20 text-yellow-500" },
-    5: { label: "Daily Global", color: "bg-pink-500/20 text-pink-400" },
-    6: { label: "Reward Income", color: "bg-orange-500/20 text-orange-400" },
-    7: { label: "Released Held", color: "bg-red-500/20 text-red-400" },
-    8: { label: "Lunar Fund", color: "bg-cyan-500/20 text-cyan-400" },
-    9: { label: "Boxer Fund", color: "bg-indigo-500/20 text-indigo-400" }
-};
+    <script>
+        async function loadTransactions() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof init === 'function') await init();
 
-// PACKAGE MAPPING ADDED HERE
-const PACKAGE_NAMES = ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9", "G10", "G11"];
+            try {
+                const userAddress = await signer.getAddress();
+                const tableBody = document.getElementById('tx-table-body');
+                tableBody.innerHTML = '';
 
-async function initPage() {
-    let attempts = 0;
-    const checkInit = setInterval(() => {
-        if (window.contract && window.signer) {
-            clearInterval(checkInit);
-            loadIncomeHistory();
+                // Blockchain se past 5000 blocks ke events target karna
+                const currentBlock = await provider.getBlockNumber();
+                const fromBlock = currentBlock - 5000 > 0 ? currentBlock - 5000 : 0;
+
+                // 1. Filters setup karna (Registration, Upgrade, Spillover)
+                const filterReg = contract.filters.Registration(null, null, userAddress);
+                const filterUpgrade = contract.filters.Upgrade(null, null, null);
+                const filterSpill = contract.filters.Spillover(null, null, null, null, null);
+
+                // Events query karna
+                const logsReg = await contract.queryFilter(filterReg, fromBlock, currentBlock);
+                const logsUpgrade = await contract.queryFilter(filterUpgrade, fromBlock, currentBlock);
+                const logsSpill = await contract.queryFilter(filterSpill, fromBlock, currentBlock);
+
+                // Saare logs ko ek single array mein combine karna
+                let allEvents = [...logsReg, ...logsUpgrade, ...logsSpill];
+                
+                // Block numbers ke mutabik sort karna (Latest Pehle)
+                allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+
+                if (allEvents.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="p-20 text-center text-gray-500 text-xs">No recent contract events found.</td></tr>';
+                    return;
+                }
+
+                let indexCounter = 1;
+
+                for (let event of allEvents) {
+                    const block = await provider.getBlock(event.blockNumber);
+                    const txDate = new Date(block.timestamp * 1000);
+                    
+                    // Date aur Time formatted formats mein
+                    const formattedDate = txDate.toLocaleDateString('en-US');
+                    const formattedTime = txDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                    let levelDisplay = "Lvl 1";
+                    let typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-income">Direct Income</span>`;
+                    let userDisplay = event.args.userAddress || "0x...000";
+                    
+                    if (event.event === "Upgrade") {
+                        levelDisplay = `Lvl ${event.args.level}`;
+                        typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-upgrade">Level Upgrade</span>`;
+                        userDisplay = await contract.idToAddress(event.args.userId);
+                    } else if (event.event === "Spillover") {
+                        levelDisplay = `Lvl ${event.args.level}`;
+                        typeBadge = `<span class="px-2 py-1 rounded text-[10px] font-bold badge-spill">Spillover</span>`;
+                        userDisplay = await contract.idToAddress(event.args.receiverId);
+                    }
+
+                    // Mapping cost matching from levels logic
+                    let costText = "10.00 USDT";
+                    if(event.args.level) {
+                        try {
+                            const costRaw = await contract.levelTokenCost(event.args.level);
+                            costText = parseFloat(ethers.utils.formatUnits(costRaw, 18)).toFixed(2) + " USDT";
+                        } catch(e) { costText = "-- USDT"; }
+                    }
+
+                    const row = document.createElement('tr');
+                    row.className = 'table-row border-b border-white/5 text-xs transition';
+
+                    row.innerHTML = `
+                        <td class="p-5 font-bold text-gray-500">${String(indexCounter++).padStart(2, '0')}</td>
+                        <td class="p-5 font-black text-pink-400">${levelDisplay}</td>
+                        <td class="p-5">
+                            <div class="flex flex-col">
+                                <span class="font-bold">${formattedDate}</span>
+                                <span class="text-[10px] text-gray-500 mt-0.5">${formattedTime}</span>
+                            </div>
+                        </td>
+                        <td class="p-5 font-mono text-purple-400">
+                            <a href="https://testnet.bscscan.com/tx/${event.transactionHash}" target="_blank" class="hover:underline">
+                                ${event.transactionHash.substring(0,6)}...${event.transactionHash.substring(60)}
+                            </a>
+                        </td>
+                        <td class="p-5 font-mono text-gray-400">
+                            ${userDisplay.substring(0,6)}...${userDisplay.substring(38)}
+                        </td>
+                        <td class="p-5 text-right">
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="font-black text-white">${costText}</span>
+                                ${typeBadge}
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error("Transaction Page Load Error:", err);
+                document.getElementById('tx-table-body').innerHTML = '<tr><td colspan="6" class="p-20 text-center text-red-500 text-xs">Error fetching ledger data from blockchain.</td></tr>';
+            }
         }
-        attempts++;
-        if (attempts > 20) {
-            clearInterval(checkInit);
-            console.error("Connection Timeout: Wallet not detected");
-        }
-    }, 1000);
-}
 
-async function loadIncomeHistory() {
-    const tableBody = document.getElementById('income-table-body');
-    const noData = document.getElementById('no-data');
-    const totalVal = document.getElementById('total-val');
-    
-    try {
-        const userAddr = await window.signer.getAddress();
-        tableBody.innerHTML = `<tr><td colspan="7" class="py-20 text-center text-yellow-500 orbitron text-xs animate-pulse">Syncing Secure Ledger...</td></tr>`;
-
-        const userData = await window.contract.getUserTotalData(userAddr);
-        const totalEarnedRaw = userData.stats[2] || "0";
-        totalVal.innerText = `$${parseFloat(ethers.utils.formatEther(totalEarnedRaw.toString())).toFixed(2)}`;
-
-        const history = await window.getIncomeHistory(userAddr);
-
-        if (!history || history.length === 0) {
-            tableBody.innerHTML = "";
-            noData.classList.remove('hidden');
-            return;
-        }
-
-        noData.classList.add('hidden');
-        let tableHTML = "";
-        
-        history.forEach((record, index) => {
-            const typeInfo = INCOME_TYPES[record.incomeType] || { label: "System Bonus", color: "bg-gray-500/20 text-gray-400" };
-            const dateDisplay = new Date(record.time * 1000).toLocaleString();
-            
-            const isSystem = (record.from === "0x0000000000000000000000000000000000000000" || !record.from);
-            const displayFrom = isSystem ? "System" : `${record.from.substring(0, 6)}...${record.from.substring(record.from.length - 4)}`;
-
-            // LOGIC: Package ID to G0, G1 mapping
-            const pkgDisplayName = PACKAGE_NAMES[record.packageId] || "G" + record.packageId;
-
-            tableHTML += `
-                <tr class="income-row border-b border-white/5 transition-colors">
-                    <td class="px-6 py-5 font-mono text-gray-500 text-xs">#${history.length - index}</td>
-                    <td class="px-6 py-5">
-                        <span class="type-badge ${typeInfo.color}">${typeInfo.label}</span>
-                    </td>
-                    <td class="px-6 py-5 font-mono text-gray-400 text-[11px]">${displayFrom}</td>
-                    <td class="px-6 py-5">
-                        <span class="bg-white/5 px-2 py-1 rounded text-white text-[10px] font-bold uppercase">${pkgDisplayName}</span>
-                    </td>
-                    <td class="px-6 py-5 font-bold text-yellow-500">${parseFloat(record.amount).toFixed(2)} USDT</td>
-                    <td class="px-6 py-5 text-gray-400 text-[11px]">${dateDisplay}</td>
-                    <td class="px-6 py-5 text-right text-green-500 font-bold text-[10px]">SUCCESS</td>
-                </tr>
-            `;
-        });
-        
-        tableBody.innerHTML = tableHTML;
-        if(window.lucide) lucide.createIcons();
-
-    } catch (err) {
-        console.error("Critical Render Error:", err);
-        tableBody.innerHTML = `<tr><td colspan="7" class="py-10 text-center text-red-500 text-xs">
-            Blockchain Mismatch. Please check if you are on BSC Testnet and refresh.
-        </td></tr>`;
-    }
-}
-
-window.addEventListener('load', initPage);
-</script>
-</script>
+        window.addEventListener('load', loadTransactions);
+    </script>
 </body>
 </html>
