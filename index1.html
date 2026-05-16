@@ -48,32 +48,50 @@
             filter: grayscale(1);
             cursor: not-allowed;
         }
+        /* Mobile handling optimizations */
+        .table-responsive::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-3 md:p-8">
 
     <div class="max-w-7xl mx-auto space-y-6">
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <div class="lg:col-span-4 glass-card p-6 flex flex-col justify-between relative overflow-hidden">
+            <!-- User Profile Block -->
+            <div class="lg:col-span-4 glass-card p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-600/20 blur-3xl rounded-full"></div>
                 
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 p-0.5">
-                            <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bnexora" class="rounded-2xl bg-dark-bg" alt="avatar">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 p-0.5 shrink-0">
+                            <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Bnexora" class="rounded-2xl bg-[#0d0118]" alt="avatar">
                         </div>
                         <div>
-                            <!-- current-rank-header matches getUserDetails rank -->
-                            <h2 class="font-extrabold text-lg" id="current-rank-header">Rank: --</h2>
-                            <p class="text-xs text-gray-400">ID: <span class="text-white font-bold" id="user-id-display">0000</span></p>
+                            <h2 class="font-extrabold text-base md:text-lg" id="current-rank-header">Rank: V0</h2>
+                            <p class="text-xs text-gray-400">ID: <span class="text-white font-bold" id="user-id-display">----</span></p>
                         </div>
                     </div>
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/10 flex items-center gap-2">
-                        <span class="text-[10px] text-gray-400 font-mono" id="connect-btn">0x00...000</span>
-                        <i data-lucide="log-out" onclick="handleLogout()" class="w-4 h-4 text-red-500 cursor-pointer hover:scale-110 transition" id="logout-icon-btn"></i>
+                    <!-- Address Badge Block with explicit dynamic variables -->
+                    <div class="bg-white/5 p-2 rounded-xl border border-white/10 flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                        <span class="text-[11px] font-mono text-pink-400 tracking-wider" id="connect-btn">0x00...000</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyWalletAddress()" class="text-gray-400 hover:text-white transition"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                            <i data-lucide="log-out" onclick="handleLogout()" class="w-4 h-4 text-red-500 cursor-pointer hover:scale-110 transition" id="logout-icon-btn"></i>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Registration Date Row Integration Hook -->
+                <div class="bg-white/5 border border-white/5 p-3 rounded-2xl mb-4 flex justify-between items-center text-xs">
+                    <span class="text-gray-400 font-bold uppercase tracking-wider text-[10px]">Joining Date</span>
+                    <span id="user-join-date" class="font-bold text-white tracking-wide">--/--/----</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 mb-6">
@@ -89,11 +107,11 @@
 
                 <div class="flex items-center justify-between mt-auto bg-gradient-to-r from-purple-900/40 to-transparent p-4 rounded-2xl border-l-4 border-pink-500">
                     <div>
-                        <p class="text-2xl font-black" id="partners-count">0</p>
+                        <p class="text-xl md:text-2xl font-black" id="partners-count">0</p>
                         <p class="text-[10px] text-gray-400 uppercase tracking-widest">Direct Partners</p>
                     </div>
                     <div>
-                        <p class="text-2xl font-black text-right" id="team-size">0</p>
+                        <p class="text-xl md:text-2xl font-black text-right" id="team-size">0</p>
                         <p class="text-[10px] text-gray-400 uppercase tracking-widest">Total Team</p>
                     </div>
                 </div>
@@ -122,8 +140,7 @@
                         </div>
                     </div>
                     <div class="mt-6">
-                        <!-- total-income matches fetchAllData -->
-                        <p class="text-4xl font-black tracking-tight" id="total-income">0.00</p>
+                        <p class="text-3xl md:text-4xl font-black tracking-tight" id="total-income">0.00</p>
                         <p class="text-xs text-gray-400 font-bold mt-1">Total USDT Earned</p>
                     </div>
                     <div class="mt-6 flex gap-2">
@@ -133,8 +150,8 @@
             </div>
         </div>
 
-        <!-- NEW LABELS PER YOUR REQUEST -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Metric Section -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div class="glass-card p-5 border-b-4 border-purple-600">
                 <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Matrix Income</p>
                 <p class="text-xl font-black text-white" id="matrix-earnings">0.00 USDT</p>
@@ -153,16 +170,39 @@
             </div>
         </div>
 
+        <!-- Latest Direct Team History Component -->
         <div class="glass-card overflow-hidden">
-            <div class="p-6 border-b border-white/10 flex justify-between items-center">
+            <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
                 <h3 class="font-bold flex items-center gap-2">
-                    <i data-lucide="history" class="text-pink-500 w-5 h-5"></i>
-                    Transaction History
+                    <i data-lucide="users" class="text-pink-500 w-5 h-5"></i>
+                    Latest Direct Partners (Recent 10)
                 </h3>
-                <button onclick="window.showHistory('income')" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition">Refresh History</button>
+                <button onclick="syncDashboardLogs()" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white transition flex items-center gap-1">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Sync Team
+                </button>
             </div>
-            <div class="p-4" id="history-container">
-                <p class="text-center text-gray-500 text-xs py-10">No recent transactions found.</p>
+            <div class="overflow-x-auto table-responsive">
+                <table class="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr class="text-[10px] text-gray-400 uppercase tracking-widest border-b border-white/5 bg-black/20">
+                            <th class="p-4">#</th>
+                            <th class="p-4">Partner Details</th>
+                            <th class="p-4">Joining Date</th>
+                            <th class="p-4">Active Slot</th>
+                            <th class="p-4 text-right">Income Generated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tx-table-body">
+                        <tr>
+                            <td colspan="5" class="p-14 text-center text-gray-500">
+                                <div class="flex flex-col items-center gap-3">
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500"></div>
+                                    <p class="text-[11px] font-bold uppercase tracking-wider">Compiling Partner Nodes...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -171,7 +211,6 @@
     <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
-        // Global functions for HTML buttons
         window.copyRef = () => {
             const copyText = document.getElementById("refURL");
             if(copyText.value === "Loading...") return;
@@ -180,29 +219,144 @@
             alert("Referral link copied!");
         };
 
-        // Syncing UI with Bnexora Contract
+        window.copyWalletAddress = async () => {
+            if(!window.signer) return;
+            const fullAddress = await window.signer.getAddress();
+            navigator.clipboard.writeText(fullAddress);
+            alert("Wallet Address Copied!");
+        };
+
         async function loadUI() {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            if (typeof ethers === 'undefined') {
+                setTimeout(loadUI, 1000);
+                return;
+            }
+
+            if (typeof init === 'function' && (!window.signer || !window.contract)) {
+                await init();
+            }
+
+            if (!window.signer || !window.contract) {
+                setTimeout(loadUI, 1000);
+                return;
+            }
+
             try {
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+                const userAddress = await window.signer.getAddress();
                 
-                // Safety check for Ethers library loading
-                if (typeof ethers === 'undefined') {
-                    console.error("Ethers library is not defined. Retrying in 1s...");
-                    setTimeout(loadUI, 1000);
+                // Truncated wallet visual link mapping
+                document.getElementById('connect-btn').innerText = 
+                    userAddress.substring(0,6) + "..." + userAddress.substring(38);
+                
+                // Dynamic Referral System Generator
+                const networkDomain = window.location.origin + window.location.pathname.replace('index1.html','');
+                document.getElementById('refURL').value = networkDomain + "?ref=" + userAddress;
+
+                // Core user structures processing
+                const details = await window.contract.getUserDetailsByAddress(userAddress);
+                
+                document.getElementById('user-id-display').innerText = details.id.toString();
+                document.getElementById('referrer-id-display').innerText = "ID " + details.referrerId.toString();
+                document.getElementById('partners-count').innerText = details.partnersCount.toString();
+                document.getElementById('active-slots-count').innerText = details.activeSlotsCount.toString() + "/12";
+                document.getElementById('team-size').innerText = details.teamSize.toString();
+                document.getElementById('total-income').innerText = parseFloat(ethers.utils.formatUnits(details.totalIncome, 18)).toFixed(2) + " USDT";
+                
+                // Mapping explicit system rank parameters
+                const rankArray = ["V0", "V1", "V2", "V3", "V4"];
+                document.getElementById('current-rank-header').innerText = "Rank: " + (rankArray[details.rank] || "V0");
+
+                // Registration UNIX compilation to local timestamp conversion
+                const joinTimestamp = details.registrationTimestamp.toNumber();
+                if(joinTimestamp > 0) {
+                    const parsedDate = new Date(joinTimestamp * 1000);
+                    document.getElementById('user-join-date').innerText = parsedDate.toLocaleDateString('en-GB'); // DD/MM/YYYY
+                }
+
+                // Call dynamic record logs compiler
+                await syncDashboardLogs();
+
+            } catch (err) {
+                console.error("Dashboard core loop panic:", err);
+            }
+        }
+
+        async function syncDashboardLogs() {
+            if(!window.contract || !window.signer) return;
+            const tableBody = document.getElementById('tx-table-body');
+            
+            try {
+                const userAddress = await window.signer.getAddress();
+                
+                // 1. Fetch complete custom logs structure
+                const history = await window.contract.getUserIncomeHistory(userAddress);
+                
+                // 2. Fetch array list of all absolute direct downstream partners 
+                const partnersList = await window.contract.getDirectPartnerAddresses(userAddress);
+
+                // Separating breakdown counts to categorize income tags
+                let totalMatrix = ethers.BigNumber.from(0);
+                let totalDirect = ethers.BigNumber.from(0);
+
+                for(let record of history) {
+                    if(record.incomeType === "Direct Income") {
+                        totalDirect = totalDirect.add(record.amount);
+                    } else {
+                        totalMatrix = totalMatrix.add(record.amount);
+                    }
+                }
+
+                document.getElementById('direct-earnings').innerText = parseFloat(ethers.utils.formatUnits(totalDirect, 18)).toFixed(2) + " USDT";
+                document.getElementById('matrix-earnings').innerText = parseFloat(ethers.utils.formatUnits(totalMatrix, 18)).toFixed(2) + " USDT";
+                document.getElementById('level-earnings').innerText = parseFloat(ethers.utils.formatUnits(totalMatrix, 18)).toFixed(2) + " USDT";
+
+                if (partnersList.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-gray-500 text-xs font-medium">No direct team partners registered under your node yet.</td></tr>';
                     return;
                 }
 
-                // 1. Initial Web3 Connection
-                if (typeof init === 'function') {
-                    await init();
-                    console.log("Web3 Initialized");
+                tableBody.innerHTML = '';
+                let displayedCount = 0;
+                let counterIndex = 1;
+
+                // Process up to 10 latest entries from the array tail
+                for (let i = partnersList.length - 1; i >= 0; i--) {
+                    if (displayedCount >= 10) break;
+                    
+                    const partnerAddress = partnersList[i];
+                    
+                    // Fetch nested details for each specific partner block
+                    const pDetails = await window.contract.getUserDetailsByAddress(partnerAddress);
+                    const partnerJoinDate = new Date(pDetails.registrationTimestamp.toNumber() * 1000).toLocaleDateString('en-GB');
+                    const partnerGeneratedAmt = parseFloat(ethers.utils.formatUnits(pDetails.totalIncome, 18)).toFixed(2) + " USDT";
+
+                    const row = document.createElement('tr');
+                    row.className = 'table-row border-b border-white/5 text-xs transition hover:bg-white/[0.02]';
+
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-gray-500">${String(counterIndex++).padStart(2, '0')}</td>
+                        <td class="p-4">
+                            <div class="flex flex-col">
+                                <span class="text-white font-black">ID: ${pDetails.id.toString()}</span>
+                                <span class="font-mono text-[10px] text-gray-400 mt-0.5">${partnerAddress.substring(0,6)}...${partnerAddress.substring(38)}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 font-medium text-gray-300">${partnerJoinDate}</td>
+                        <td class="p-4 font-bold text-pink-400">Slot ${pDetails.activeSlotsCount.toString()}</td>
+                        <td class="p-4 text-right font-black text-emerald-400">${partnerGeneratedAmt}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                    displayedCount++;
                 }
                 
-                // 2. Fetch history if function exists
-                if(window.showHistory) window.showHistory('income');
+                if(typeof lucide !== 'undefined') lucide.createIcons();
 
-            } catch (err) {
-                console.error("Dashboard Load Error:", err);
+            } catch(e) {
+                console.error("Team processing array compile exception:", e);
+                tableBody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-500 text-xs">Failed to load dynamic network table maps.</td></tr>';
             }
         }
 
