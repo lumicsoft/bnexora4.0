@@ -469,7 +469,7 @@ async function fetchAllData(address) {
         updateText('all-income', income);
         
         // Matrix, Level aur Direct Income (Contract abhi total income hi de raha hai)
-        updateText('matrix-earnings', income + " USDT"); 
+        updateText('matrix-earningss', income + " USDT"); 
         updateText('level-earnings', "0.00 USDT");
         updateText('direct-earnings', "0.00 USDT");
 
