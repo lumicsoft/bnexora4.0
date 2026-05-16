@@ -310,7 +310,7 @@
 
                 document.getElementById('direct-earnings').innerText = parseFloat(ethers.utils.formatUnits(totalDirect, 18)).toFixed(2) + " USDT";
                 document.getElementById('matrix-earnings').innerText = parseFloat(ethers.utils.formatUnits(totalMatrix, 18)).toFixed(2) + " USDT";
-                document.getElementById('all-income').innerText = parseFloat(ethers.utils.formatUnits(totalMatrix, 18)).toFixed(2) + " USDT";
+                
 
                 if (partnersList.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-gray-500 text-xs font-medium">No direct team partners registered under your node yet.</td></tr>';
