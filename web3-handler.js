@@ -35,6 +35,7 @@ const CONTRACT_ABI = [
     "event Registration(uint256 indexed userId, uint256 indexed referrerId, address indexed userAddress)",
     "event Upgrade(uint256 indexed userId, uint256 indexed newReferrerId, uint8 level)",
     "event RankUpdated(address indexed user, uint8 newRank)",
+    "function getUserIncomeHistory(address userAddress) public view returns (tuple(uint8 level, uint256 amount, string incomeType, address fromUser, uint256 fromUserId, uint256 matrixCycle, uint256 timestamp)[])",
     "event Spillover(uint256 indexed referrerId, uint256 indexed receiverId, uint8 level, uint256 cycle, uint8 virtualSpot)"
 ];
 const USDT_ABI = [
