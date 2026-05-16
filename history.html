@@ -94,11 +94,7 @@
  <script src="components.js"></script>
     <script src="web3-handler.js"></script>
     <script>
-        // Contract ke naye struct aur view function ke anusar dynamic array ABI array setup
-        const LOCAL_ABI = [
-            "function getUserIncomeHistory(address userAddress) public view returns (tuple(uint8 level, uint256 amount, string incomeType, address fromUser, uint256 fromUserId, uint256 matrixCycle, uint256 timestamp)[])"
-        ];
-
+      
         async function loadTransactions() {
             if (typeof lucide !== 'undefined') lucide.createIcons();
             
