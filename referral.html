@@ -58,9 +58,10 @@
                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Total Team</p>
                 <h2 class="text-3xl font-black" id="all-team">0</h2>
             </div>
-            <div class="glass-card p-6 border-l-4 border-pink-500">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Registration Mode</p>
-                <h2 class="text-xl font-black">Wallet Address</h2>
+            <!-- CHANGED: Registration mode changed to Total Income Display box -->
+            <div class="glass-card p-6 border-l-4 border-pink-500 bg-gradient-to-br from-purple-900/10 to-transparent">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Total Income</p>
+                <h2 class="text-2xl font-black text-emerald-400" id="total-earnings-display">0.00 USDT</h2>
             </div>
         </div>
 
@@ -87,7 +88,6 @@
                         </tr>
                     </thead>
                     <tbody id="referrals-table-body">
-                        <!-- Data will load here dynamically -->
                         <tr>
                             <td colspan="6" class="p-20 text-center text-gray-500">
                                 <div class="flex flex-col items-center gap-4">
@@ -105,16 +105,28 @@
     <script src="web3-handler.js"></script>
     <script>
         async function loadReferrals() {
-            lucide.createIcons();
-            if (typeof init === 'function') await init();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            if (typeof init === 'function' && (!window.signer || !window.contract)) {
+                await init();
+            }
+
+            if (!window.signer || !window.contract) {
+                setTimeout(loadReferrals, 1000);
+                return;
+            }
 
             try {
-                const userAddress = await signer.getAddress();
+                const userAddress = await window.signer.getAddress();
+                
+                // Fetch current user details to extract absolute Team Size and Total Income values
+                const userDetails = await window.contract.getUserDetailsByAddress(userAddress);
+                document.getElementById('all-team').innerText = userDetails.teamSize.toString();
+                document.getElementById('total-earnings-display').innerText = parseFloat(ethers.utils.formatUnits(userDetails.totalIncome, 18)).toFixed(2) + " USDT";
                 
                 // 1. Get List of Direct Partner Addresses
-                const partners = await contract.getDirectPartnerAddresses(userAddress);
+                const partners = await window.contract.getDirectPartnerAddresses(userAddress);
                 document.getElementById('total-directs-count').innerText = partners.length;
-               
 
                 const tableBody = document.getElementById('referrals-table-body');
                 tableBody.innerHTML = '';
@@ -126,16 +138,16 @@
 
                 // 2. Loop through each partner to get their individual details
                 for (let partnerAddr of partners) {
-                    const details = await contract.getUserDetailsByAddress(partnerAddr);
+                    const details = await window.contract.getUserDetailsByAddress(partnerAddr);
                     
                     const row = document.createElement('tr');
                     row.className = 'table-row border-b border-white/5 transition';
                     
-                    const date = new Date(details.registrationTimestamp * 1000).toLocaleDateString();
+                    const date = new Date(details.registrationTimestamp.toNumber() * 1000).toLocaleDateString('en-GB');
                     
                     row.innerHTML = `
                         <td class="p-6">
-                            <span class="bg-white/5 px-3 py-1 rounded-lg text-xs font-bold">#${details.id}</span>
+                            <span class="bg-white/5 px-3 py-1 rounded-lg text-xs font-bold">#${details.id.toString()}</span>
                         </td>
                         <td class="p-6">
                             <div class="flex flex-col">
@@ -144,10 +156,10 @@
                             </div>
                         </td>
                         <td class="p-6 text-center">
-                            <span class="text-pink-500 font-black">Lvl ${details.activeSlotsCount}</span>
+                            <span class="text-pink-500 font-black">Slot ${details.activeSlotsCount.toString()}</span>
                         </td>
                         <td class="p-6 text-center">
-                            <span class="font-bold text-gray-300">${details.teamSize} Members</span>
+                            <span class="font-bold text-gray-300">${details.teamSize.toString()} Members</span>
                         </td>
                         <td class="p-6 text-center">
                             <span class="px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded text-[10px] font-bold text-purple-400">V${details.rank}</span>
